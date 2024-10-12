@@ -1,17 +1,25 @@
 import discord
+from discord import Interaction
 from utils.database_operations import clear_user_history
 import logging
+from typing import Optional
 
-async def send_message(interaction, content, ephemeral=True):
+async def send_message(interaction: Interaction, content: str, ephemeral: bool = True, embed: Optional[discord.Embed] = None):
     try:
-        await interaction.response.send_message(content, ephemeral=ephemeral)
+        if embed:
+            await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
+        else:
+            await interaction.response.send_message(content, ephemeral=ephemeral)
     except discord.errors.NotFound:
-        await interaction.followup.send(content, ephemeral=ephemeral)
+        if embed:
+            await interaction.followup.send(embed=embed, ephemeral=ephemeral)
+        else:
+            await interaction.followup.send(content, ephemeral=ephemeral)
 
-async def ping(interaction: discord.Interaction):
+async def ping(interaction: Interaction):
     await send_message(interaction, 'Pong!', ephemeral=False)
 
-async def help_command(interaction: discord.Interaction):
+async def help_command(interaction: Interaction):
     help_embed = discord.Embed(title="Bot Commands", color=discord.Color.blue())
     
     commands = {
@@ -40,7 +48,7 @@ async def help_command(interaction: discord.Interaction):
     
     await send_message(interaction, embed=help_embed, ephemeral=False)
 
-async def clear(interaction: discord.Interaction):
+async def clear(interaction: Interaction):
     try:
         rows_deleted = await clear_user_history()
         response_message = f"All conversation history has been cleared. {rows_deleted} entries have been deleted."
