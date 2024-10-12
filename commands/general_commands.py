@@ -10,7 +10,8 @@ async def help_command(interaction: discord.Interaction):
     general_commands = [
         ("/help", "Show this help message"),
         ("/ping", "Check if the bot is responsive"),
-        ("/clear", "Clear your command history (Authorized users only)")
+        ("/clear", "Clear your command history (Authorized users only)"),
+        ("/sync", "Synchronize slash commands (Admin only)")
     ]
     
     ai_commands = [
