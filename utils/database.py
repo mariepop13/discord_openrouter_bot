@@ -51,3 +51,7 @@ def set_personalization(cursor, user_id, field, value):
 def get_history(cursor, user_id, limit):
     cursor.execute('SELECT content, model FROM messages WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?', (user_id, limit))
     return cursor.fetchall()
+
+def clear_user_history(cursor, user_id):
+    cursor.execute('DELETE FROM messages WHERE user_id = ?', (user_id,))
+    return cursor.rowcount  # Return the number of rows affected

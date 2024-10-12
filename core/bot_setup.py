@@ -3,7 +3,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from commands.command_handler import setup_commands
-from commands.ai_commands import analyze_image_command
+from commands.ai_commands import ai_command
+from commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
+from commands.general_commands import clear, ping
 from dotenv import load_dotenv
 
 def setup_bot():
@@ -35,6 +37,12 @@ def setup_bot():
         await bot.tree.sync()
         print("Slash commands synced")
 
+    @bot.tree.command(name="ai", description="Chat with the AI")
+    @app_commands.describe(message="Your message to the AI")
+    async def ai(interaction: discord.Interaction, message: str):
+        await interaction.response.defer()
+        await ai_command(interaction, message)
+
     @bot.tree.command(name="analyze", description="Analyze an attached image")
     async def analyze(interaction: discord.Interaction, image: discord.Attachment):
         if not image.content_type.startswith('image/'):
@@ -43,6 +51,52 @@ def setup_bot():
 
         await interaction.response.defer()
         await analyze_image_command(interaction, image)
+
+    @bot.tree.command(name="clear", description="Clear your command history")
+    async def clear_command(interaction: discord.Interaction):
+        await interaction.response.defer()
+        await clear(interaction)
+
+    @bot.tree.command(name="generate_image", description="Generate an image based on a prompt")
+    @app_commands.describe(prompt="Your image generation prompt")
+    async def generate_image(interaction: discord.Interaction, prompt: str):
+        await interaction.response.defer()
+        await generate_image_command(interaction, prompt, bot)
+
+    @bot.tree.command(name="help", description="Get information about available commands")
+    async def help_command(interaction: discord.Interaction):
+        help_text = """
+        Available commands:
+        /ai [message] - Chat with the AI
+        /analyze [image] - Analyze an attached image
+        /clear - Clear your command history
+        /generate_image [prompt] - Generate an image based on a prompt
+        /help - Show this help message
+        /image_help - Get help with image generation commands
+        /ping - Check if the bot is responsive
+        /sync - Synchronize slash commands (Admin only)
+        """
+        await interaction.response.send_message(help_text)
+
+    @bot.tree.command(name="image_help", description="Get help with image generation commands")
+    async def image_help_command(interaction: discord.Interaction):
+        await interaction.response.defer()
+        await image_generation_help(interaction)
+
+    @bot.tree.command(name="ping", description="Check if the bot is responsive")
+    async def ping_command(interaction: discord.Interaction):
+        await interaction.response.defer()
+        await ping(interaction)
+
+    @bot.tree.command(name="sync", description="Synchronize slash commands (Admin only)")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def sync(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        try:
+            synced = await bot.tree.sync()
+            await interaction.followup.send(f"Synced {len(synced)} commands.", ephemeral=True)
+        except Exception as e:
+            await interaction.followup.send(f"An error occurred while syncing commands: {str(e)}", ephemeral=True)
 
     setup_commands(bot)
     print("Bot setup completed in bot_setup.py")

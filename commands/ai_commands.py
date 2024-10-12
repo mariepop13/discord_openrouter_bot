@@ -17,44 +17,22 @@ async def analyze_image_command(ctx, image: discord.Attachment):
         else:
             await ctx.send(error_message)
 
-async def ai_command(message, args, bot):
-    if len(args) < 1:
-        await message.channel.send("Usage: !ai [action] [message]")
-        return
+async def ai_command(interaction: discord.Interaction, message: str):
+    bot = interaction.client
+    personalization = get_personalization(bot.db_cursor, interaction.user.id)
+    
+    if personalization:
+        pers, tn, lang = personalization
+        message = f"Please respond as if you have a {pers} personality, with a {tn} tone, in {lang} language. User message: {message}"
 
-    action = args[0]
-    msg = ' '.join(args[1:]) if len(args) > 1 else ""
+    insert_message(bot.db_cursor, interaction.user.id, message, "google/gemini-flash-1.5")
+    bot.db_conn.commit()
 
-    if action == "chat":
-        personalization = get_personalization(bot.db_cursor, message.author.id)
-        
-        if personalization:
-            pers, tn, lang = personalization
-            msg = f"Please respond as if you have a {pers} personality, with a {tn} tone, in {lang} language. User message: {msg}"
+    bot_response = await chat_with_ai("google/gemini-flash-1.5", message, 150)
+    await interaction.followup.send(bot_response)
 
-        insert_message(bot.db_cursor, message.author.id, msg, "google/gemini-flash-1.5")
-        bot.db_conn.commit()
-
-        bot_response = await chat_with_ai("google/gemini-flash-1.5", msg, 150)
-        await message.channel.send(bot_response)
-
-    elif action in ["set_personality", "set_tone", "set_language"]:
-        if msg:
-            set_personalization(bot.db_cursor, message.author.id, action.split('_')[1], msg)
-            bot.db_conn.commit()
-            await message.channel.send(f"AI {action.split('_')[1]} set to: {msg}")
-        else:
-            await message.channel.send(f"Please provide a {action.split('_')[1]}.")
-
-    elif action == "generate_image":
-        if msg:
-            try:
-                output = await generate_image(msg)
-                await message.channel.send(f"Generated image: {output}")
-            except Exception as e:
-                await message.channel.send(f"Sorry, I couldn't generate the image. Error: {str(e)}")
-        else:
-            await message.channel.send("Please provide a prompt for image generation.")
-
-    else:
-        await message.channel.send("Invalid action. Please use 'chat', 'set_personality', 'set_tone', 'set_language', or 'generate_image'.")
+async def set_ai_option(interaction: discord.Interaction, option: str, value: str):
+    bot = interaction.client
+    set_personalization(bot.db_cursor, interaction.user.id, option, value)
+    bot.db_conn.commit()
+    await interaction.response.send_message(f"AI {option} set to: {value}")
