@@ -59,7 +59,7 @@ def initialize_bot():
                     return MockFollowup()
 
             mock_interaction = MockInteraction(message)
-            await mock_interaction.response().defer()
+            await (await mock_interaction.response()).defer()
             await ai_command(mock_interaction)
         await bot.process_commands(message)
 
