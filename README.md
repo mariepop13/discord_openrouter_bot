@@ -1,16 +1,6 @@
 # Discord OpenRouter Bot
 
-This Discord bot uses OpenRouter.ai API to interact with various AI models, analyze images, and generate images using Replicate. The bot now responds only when mentioned and uses a single /ai command for multiple functions.
-
-## File Structure
-
-- `main.py`: Entry point of the application
-- `bot_setup.py`: Bot setup and configuration
-- `commands.py`: Bot commands implementation
-- `api_utils.py`: API-related functions
-- `database.py`: Database operations
-- `models.py`: Available AI models
-- `requirements.txt`: List of required packages
+This Discord bot uses OpenRouter.ai API to interact with various AI models, analyze images, and generate images using Replicate. The bot responds when mentioned and uses a set of commands for multiple functions.
 
 ## Setup
 
@@ -37,7 +27,7 @@ python main.py
 
 ## Bot Behavior
 
-The bot now only responds when it is mentioned (@bot_name) in a message. This ensures that the bot doesn't interfere with regular conversations unless explicitly called upon.
+The bot responds when it is mentioned (@bot_name) in a message or when specific commands are used. This ensures that the bot doesn't interfere with regular conversations unless explicitly called upon.
 
 ## Available Commands
 
@@ -46,19 +36,22 @@ The bot now only responds when it is mentioned (@bot_name) in a message. This en
   - `set_personality`: Set the AI's personality for chat
   - `set_tone`: Set the AI's tone for chat
   - `set_language`: Set the preferred language for AI chat
+  - `analyze_image`: Analyze an image using AI
   - `generate_image`: Generate an image based on a prompt
 
   Usage examples:
   ```
-  /ai action:chat message:"Hello, how are you?" model:openai/gpt-3.5-turbo max_tokens:100
-  /ai action:set_personality personality:"friendly and helpful"
-  /ai action:set_tone tone:"professional"
-  /ai action:set_language language:"French"
-  /ai action:generate_image message:"A beautiful sunset over the ocean"
+  /ai chat message:"Hello, how are you?" model:openai/gpt-3.5-turbo max_tokens:100
+  /ai set_personality personality:"friendly and helpful"
+  /ai set_tone tone:"professional"
+  /ai set_language language:"French"
+  /ai analyze_image [attach an image]
+  /ai generate_image prompt:"A beautiful sunset over the ocean"
   ```
 
 - `/history`: Get your chat history
 - `/models`: List available AI models
+- `/help`: Display help information about available commands
 
 ## Contributing
 

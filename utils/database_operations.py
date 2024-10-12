@@ -46,18 +46,48 @@ async def set_ai_preferences(user_id: int, ai_model: Optional[str] = None, max_o
         logging.error(f"Error setting AI preferences: {str(e)}")
         raise
 
-async def get_history(user_id: int, limit: int) -> List[Tuple[Any, ...]]:
+async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only: bool = False) -> Any:
     try:
-        return await execute_query('''
-            SELECT user_id, content, model, message_type, timestamp 
-            FROM messages 
-            WHERE user_id = ? OR message_type = 'bot' 
-            ORDER BY timestamp DESC 
-            LIMIT ?
-        ''', (user_id, limit))
+        if count_only:
+            query = '''
+                SELECT COUNT(*) 
+                FROM messages 
+                WHERE user_id = ? OR 
+                      (message_type = 'bot' AND id IN (
+                          SELECT m2.id 
+                          FROM messages m2 
+                          WHERE m2.message_type = 'bot' AND 
+                                m2.timestamp >= (
+                                    SELECT MIN(timestamp) 
+                                    FROM messages 
+                                    WHERE user_id = ? AND message_type = 'user'
+                                )
+                      ))
+            '''
+            result = await execute_query(query, (user_id, user_id), fetchone=True)
+            return result[0] if result else 0
+        else:
+            query = '''
+                SELECT user_id, content, model, message_type, timestamp 
+                FROM messages 
+                WHERE user_id = ? OR 
+                      (message_type = 'bot' AND id IN (
+                          SELECT m2.id 
+                          FROM messages m2 
+                          WHERE m2.message_type = 'bot' AND 
+                                m2.timestamp >= (
+                                    SELECT MIN(timestamp) 
+                                    FROM messages 
+                                    WHERE user_id = ? AND message_type = 'user'
+                                )
+                      ))
+                ORDER BY timestamp DESC 
+                LIMIT ? OFFSET ?
+            '''
+            return await execute_query(query, (user_id, user_id, limit, offset))
     except Exception as e:
         logging.error(f"Error getting history: {str(e)}")
-        return []
+        return [] if not count_only else 0
 
 async def clear_user_history() -> int:
     try:
@@ -80,22 +110,7 @@ async def clear_user_history() -> int:
 
 async def count_user_history(user_id: int) -> int:
     try:
-        result = await execute_query('''
-            SELECT COUNT(*) 
-            FROM messages 
-            WHERE user_id = ? OR 
-                  (message_type = 'bot' AND id IN (
-                      SELECT m2.id 
-                      FROM messages m2 
-                      WHERE m2.message_type = 'bot' AND 
-                            m2.timestamp >= (
-                                SELECT MIN(timestamp) 
-                                FROM messages 
-                                WHERE user_id = ? AND message_type = 'user'
-                            )
-                  ))
-        ''', (user_id, user_id), fetchone=True)
-        return result[0] if result else 0
+        return await get_history(user_id, count_only=True)
     except Exception as e:
         logging.error(f"Error counting user history: {str(e)}")
         return 0
