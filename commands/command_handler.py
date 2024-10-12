@@ -26,7 +26,11 @@ def setup_commands(bot):
             elif command in ['!ai', '/ai']:
                 await ai_command(message, args, bot)
 
-            elif command in ['/analyse', '/analyze']:
-                await analyze_image_command(message)
+            elif command in ['!analyze', '/analyze']:
+                if message.attachments:
+                    image = message.attachments[0]
+                    await analyze_image_command(message, image)
+                else:
+                    await message.channel.send("Please attach an image to analyze.")
 
         # Messages without '!' or '/' prefix are ignored

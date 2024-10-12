@@ -2,22 +2,20 @@ import discord
 from utils.api_utils import chat_with_ai, generate_image, analyze_image
 from utils.database import insert_message, get_personalization, set_personalization
 
-async def analyze_image_command(message):
-    if len(message.attachments) == 0:
-        await message.channel.send("Please upload an image with the /analyse command.")
-        return
-
-    image = message.attachments[0]
-    if not image.content_type.startswith('image/'):
-        await message.channel.send("The uploaded file is not an image. Please upload an image file.")
-        return
-
+async def analyze_image_command(ctx, image: discord.Attachment):
     try:
         image_url = image.url
         description = await analyze_image(image_url)
-        await message.channel.send(f"Image analysis: {description}")
+        if isinstance(ctx, discord.Interaction):
+            await ctx.followup.send(f"Image analysis: {description}")
+        else:
+            await ctx.send(f"Image analysis: {description}")
     except Exception as e:
-        await message.channel.send(f"Sorry, I couldn't analyze the image. Error: {str(e)}")
+        error_message = f"Sorry, I couldn't analyze the image. Error: {str(e)}"
+        if isinstance(ctx, discord.Interaction):
+            await ctx.followup.send(error_message)
+        else:
+            await ctx.send(error_message)
 
 async def ai_command(message, args, bot):
     if len(args) < 1:
@@ -58,8 +56,5 @@ async def ai_command(message, args, bot):
         else:
             await message.channel.send("Please provide a prompt for image generation.")
 
-    elif action == "analyse":
-        await analyze_image_command(message)
-
     else:
-        await message.channel.send("Invalid action. Please use 'chat', 'set_personality', 'set_tone', 'set_language', 'generate_image', or 'analyse'.")
+        await message.channel.send("Invalid action. Please use 'chat', 'set_personality', 'set_tone', 'set_language', or 'generate_image'.")
