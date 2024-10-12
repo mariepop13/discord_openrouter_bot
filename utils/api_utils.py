@@ -5,7 +5,7 @@ import replicate
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-async def chat_with_ai(message, max_tokens):
+async def chat_with_ai(messages, max_tokens):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "HTTP-Referer": "https://github.com/yourusername/your-repo",  # Replace with your GitHub repo or actual domain
@@ -14,7 +14,7 @@ async def chat_with_ai(message, max_tokens):
     }
     data = {
         "model": "openai/chatgpt-4o-latest",
-        "messages": [{"role": "user", "content": message}],
+        "messages": messages,
         "max_tokens": max_tokens
     }
 

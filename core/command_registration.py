@@ -63,7 +63,7 @@ def register_commands(bot):
         await image_generation_help(interaction)
 
     # Utility Commands
-    @bot.tree.command(name="clear", description="Clear your command history")
+    @bot.tree.command(name="clear", description="Clear the database")
     async def clear_command(interaction: discord.Interaction):
         await clear(interaction)
 

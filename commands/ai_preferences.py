@@ -1,6 +1,6 @@
 from typing import Literal
 import discord
-from utils.database import set_personalization, set_ai_preferences
+from utils.database_operations import set_personalization, set_ai_preferences
 
 # Constants for option names
 PERSONALITY = 'personality'
@@ -15,13 +15,13 @@ OptionType = Literal[PERSONALITY, TONE, LANGUAGE, PREBUILD, MODEL, MAX_TOKENS]
 async def set_ai_preferences_command(interaction: discord.Interaction, option: OptionType, value: str):
     try:
         if option in [PERSONALITY, TONE, LANGUAGE, PREBUILD]:
-            set_personalization(interaction.user.id, option, value)
+            await set_personalization(interaction.user.id, option, value)
         elif option == MODEL:
-            set_ai_preferences(interaction.user.id, ai_model=value)
+            await set_ai_preferences(interaction.user.id, ai_model=value)
         elif option == MAX_TOKENS:
             try:
                 max_tokens = int(value)
-                set_ai_preferences(interaction.user.id, max_output=max_tokens)
+                await set_ai_preferences(interaction.user.id, max_output=max_tokens)
             except ValueError:
                 await interaction.response.send_message("Error: max_tokens must be an integer.", ephemeral=True)
                 return

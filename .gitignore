@@ -33,6 +33,7 @@ ENV/
 
 # SQLite database
 *.sqlite
+bot_database.db
 
 # Logs
 *.log

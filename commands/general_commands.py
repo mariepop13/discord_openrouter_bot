@@ -1,5 +1,5 @@
 import discord
-from utils.database import clear_user_history
+from utils.database_operations import clear_user_history
 import logging
 
 async def send_message(interaction, content, ephemeral=True):

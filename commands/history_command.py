@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from utils.database import get_history
+from utils.database_operations import get_history
 from datetime import datetime
 import logging
 import os
@@ -10,10 +10,10 @@ MAX_MESSAGE_LENGTH = 500
 MAX_EMBED_LENGTH = 4000
 CLIENT_ID = int(os.getenv('CLIENT_ID', '0'))
 
-def format_message(user_id, content, model, message_type, timestamp):
+def format_message(message_user_id, content, model, message_type, timestamp):
     formatted_time = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
-    icon = "🧑" if message_type == 'user' and user_id != CLIENT_ID else "🤖"
-    sender = "You" if message_type == 'user' and user_id != CLIENT_ID else f"AI ({model})"
+    icon = "🧑" if message_type == 'user' and message_user_id != CLIENT_ID else "🤖"
+    sender = "You" if message_type == 'user' and message_user_id != CLIENT_ID else f"AI ({model})"
     
     formatted_message = f"{icon} **{sender}** - {formatted_time}\n```{content[:MAX_MESSAGE_LENGTH]}```"
     if len(content) > MAX_MESSAGE_LENGTH:
@@ -33,7 +33,7 @@ async def history(interaction: discord.Interaction, limit: int = 10):
             await interaction.followup.send("You don't have any chat history yet.", ephemeral=True)
             return
         
-        formatted_history = "\n\n".join([format_message(user_id, *message) for message in chat_history])
+        formatted_history = "\n\n".join([format_message(*message) for message in chat_history])
         chunks = [formatted_history[i:i+MAX_EMBED_LENGTH] for i in range(0, len(formatted_history), MAX_EMBED_LENGTH)]
         
         for i, chunk in enumerate(chunks):
