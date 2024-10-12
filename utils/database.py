@@ -1,33 +1,47 @@
 import sqlite3
 import logging
+from contextlib import asynccontextmanager
+from typing import List, Tuple, Optional, Any
 
-def setup_database():
-    conn = sqlite3.connect('bot_database.sqlite')
-    cursor = conn.cursor()
+DATABASE_NAME = 'bot_database.sqlite'
+DEFAULT_AI_MODEL = "google/gemini-flash-1.5"
+DEFAULT_MAX_OUTPUT = 150
 
-    # Create messages table if it doesn't exist
-    cursor.execute('''
+@asynccontextmanager
+async def get_db_connection():
+    conn = sqlite3.connect(DATABASE_NAME)
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+async def setup_database():
+    async with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        await create_tables(cursor)
+        await run_migrations(cursor)
+        
+        conn.commit()
+
+async def create_tables(cursor: sqlite3.Cursor):
+    cursor.executescript('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             content TEXT,
             model TEXT,
+            message_type TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
-    # Create comments table if it doesn't exist
-    cursor.execute('''
+        );
+        
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             content TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
-    # Create personalization table if it doesn't exist
-    cursor.execute('''
+        );
+        
         CREATE TABLE IF NOT EXISTS personalization (
             user_id INTEGER PRIMARY KEY,
             personality TEXT,
@@ -35,53 +49,64 @@ def setup_database():
             language TEXT,
             ai_model TEXT,
             max_output INTEGER
-        )
+        );
     ''')
 
-    conn.commit()
+async def run_migrations(cursor: sqlite3.Cursor):
+    migrations = {
+        'personalization': ['ai_model', 'max_output'],
+        'messages': ['message_type']
+    }
     
-    # Run database migrations
-    run_migrations(cursor)
-    
-    conn.commit()
-    return conn, cursor
+    for table, new_columns in migrations.items():
+        existing_columns = await get_existing_columns(cursor, table)
+        for column in new_columns:
+            if column not in existing_columns:
+                logging.info(f"Adding {column} column to {table} table")
+                cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} TEXT")
 
-def run_migrations(cursor):
-    # Check if ai_model column exists in personalization table
-    cursor.execute("PRAGMA table_info(personalization)")
-    columns = [column[1] for column in cursor.fetchall()]
-    
-    if 'ai_model' not in columns:
-        logging.info("Adding ai_model column to personalization table")
-        cursor.execute("ALTER TABLE personalization ADD COLUMN ai_model TEXT")
-    
-    if 'max_output' not in columns:
-        logging.info("Adding max_output column to personalization table")
-        cursor.execute("ALTER TABLE personalization ADD COLUMN max_output INTEGER")
+async def get_existing_columns(cursor: sqlite3.Cursor, table: str) -> List[str]:
+    cursor.execute(f"PRAGMA table_info({table})")
+    return [column[1] for column in cursor.fetchall()]
 
-def insert_message(cursor, user_id, content, model):
-    cursor.execute('INSERT INTO messages (user_id, content, model) VALUES (?, ?, ?)', (user_id, content, model))
+async def execute_query(query: str, params: Tuple = (), fetchone: bool = False) -> Any:
+    async with get_db_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query, params)
+            conn.commit()
+            if fetchone:
+                return cursor.fetchone()
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            logging.error(f"Database error: {e}")
+            raise
 
-def get_personalization(cursor, user_id):
-    cursor.execute('SELECT personality, tone, language, ai_model, max_output FROM personalization WHERE user_id = ?', (user_id,))
-    return cursor.fetchone()
+async def insert_message(user_id: int, content: str, model: str, message_type: str):
+    await execute_query('INSERT INTO messages (user_id, content, model, message_type) VALUES (?, ?, ?, ?)',
+                        (user_id, content, model, message_type))
 
-def set_personalization(cursor, user_id, field, value):
-    cursor.execute(f'INSERT OR REPLACE INTO personalization (user_id, {field}) VALUES (?, ?)', (user_id, value))
+async def get_personalization(user_id: int) -> Optional[Tuple]:
+    return await execute_query('SELECT personality, tone, language, ai_model, max_output FROM personalization WHERE user_id = ?',
+                               (user_id,), fetchone=True)
 
-def get_ai_preferences(cursor, user_id):
-    cursor.execute('SELECT ai_model, max_output FROM personalization WHERE user_id = ?', (user_id,))
-    result = cursor.fetchone()
-    return result if result else ("google/gemini-flash-1.5", 150)  # Default values if not set
+async def set_personalization(user_id: int, field: str, value: str):
+    await execute_query(f'INSERT OR REPLACE INTO personalization (user_id, {field}) VALUES (?, ?)',
+                        (user_id, value))
 
-def set_ai_preferences(cursor, user_id, ai_model=None, max_output=None):
-    cursor.execute('INSERT OR REPLACE INTO personalization (user_id, ai_model, max_output) VALUES (?, ?, ?)',
-                   (user_id, ai_model, max_output))
+async def get_ai_preferences(user_id: int) -> Tuple[str, int]:
+    result = await execute_query('SELECT ai_model, max_output FROM personalization WHERE user_id = ?',
+                                 (user_id,), fetchone=True)
+    return result if result else (DEFAULT_AI_MODEL, DEFAULT_MAX_OUTPUT)
 
-def get_history(cursor, user_id, limit):
-    cursor.execute('SELECT content, model FROM messages WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?', (user_id, limit))
-    return cursor.fetchall()
+async def set_ai_preferences(user_id: int, ai_model: Optional[str] = None, max_output: Optional[int] = None):
+    await execute_query('INSERT OR REPLACE INTO personalization (user_id, ai_model, max_output) VALUES (?, ?, ?)',
+                        (user_id, ai_model, max_output))
 
-def clear_user_history(cursor, user_id):
-    cursor.execute('DELETE FROM messages WHERE user_id = ?', (user_id,))
-    return cursor.rowcount  # Return the number of rows affected
+async def get_history(user_id: int, limit: int) -> List[Tuple]:
+    return await execute_query('SELECT content, model, message_type, timestamp FROM messages WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?',
+                               (user_id, limit))
+
+async def clear_user_history(user_id: int) -> int:
+    result = await execute_query('DELETE FROM messages WHERE user_id = ?', (user_id,))
+    return result.rowcount if result else 0
