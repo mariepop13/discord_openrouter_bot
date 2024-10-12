@@ -1,34 +1,13 @@
 import discord
 from discord import app_commands
-from commands.ai_commands import ai_command, set_ai_preferences_command
+from commands.ai_preferences import set_ai_preferences_command
 from commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
 from commands.general_commands import clear, ping
 from core.help_command import help_command
 from utils.models import MODELS
 
 def register_commands(bot):
-    @bot.tree.command(name="ai", description="Chat with the AI")
-    @app_commands.describe(
-        model="AI model to use (optional)",
-        max_tokens="Maximum output tokens (optional)"
-    )
-    @app_commands.choices(model=[
-        app_commands.Choice(name=model, value=model) for model in MODELS
-    ])
-    async def ai(interaction: discord.Interaction, model: str = None, max_tokens: int = None):
-        await interaction.response.defer()
-        await ai_command(interaction, model, max_tokens)
-
-    @bot.tree.command(name="set_ai_preferences", description="Set AI preferences")
-    @app_commands.describe(
-        model="AI model to use",
-        max_tokens="Maximum output tokens"
-    )
-    @app_commands.choices(model=[
-        app_commands.Choice(name=model, value=model) for model in MODELS
-    ])
-    async def set_ai_preferences(interaction: discord.Interaction, model: str = None, max_tokens: int = None):
-        await set_ai_preferences_command(interaction, model, max_tokens)
+    bot.tree.command(name="set_ai_preferences", description="Set AI preferences")(set_ai_preferences_command)
 
     @bot.tree.command(name="analyze", description="Analyze an attached image")
     async def analyze(interaction: discord.Interaction, image: discord.Attachment):
