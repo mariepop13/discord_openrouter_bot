@@ -18,7 +18,7 @@ async def help_command(interaction: discord.Interaction):
         "General Commands": [
             ("/help", "Show this help message"),
             ("/ping", "Check if the bot is responsive"),
-            ("/clear", "Clear your command history"),
+            ("/clear", "Clear all conversation history"),
             ("/sync", "Synchronize slash commands (Admin only)")
         ],
         "AI Commands": [
@@ -42,9 +42,9 @@ async def help_command(interaction: discord.Interaction):
 
 async def clear(interaction: discord.Interaction):
     try:
-        rows_deleted = await clear_user_history(interaction.user.id)
-        response_message = f"Your command history has been cleared. {rows_deleted} entries have been deleted."
+        rows_deleted = await clear_user_history()
+        response_message = f"All conversation history has been cleared. {rows_deleted} entries have been deleted."
         await send_message(interaction, response_message)
     except Exception as e:
-        logging.error(f"Error in clear command for user {interaction.user.id}: {str(e)}")
-        await send_message(interaction, "An error occurred while clearing your history. Please try again later.")
+        logging.error(f"Error in clear command: {str(e)}")
+        await send_message(interaction, "An error occurred while clearing the conversation history. Please try again later.")

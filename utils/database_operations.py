@@ -34,22 +34,20 @@ async def get_history(user_id: int, limit: int) -> List[Tuple]:
         LIMIT ?
     ''', (user_id, limit))
 
-async def clear_user_history(user_id: int) -> int:
-    result = await execute_query('''
-        DELETE FROM messages 
-        WHERE user_id = ? OR 
-              (message_type = 'bot' AND id IN (
-                  SELECT m2.id 
-                  FROM messages m2 
-                  WHERE m2.message_type = 'bot' AND 
-                        m2.timestamp > (
-                            SELECT MAX(timestamp) 
-                            FROM messages 
-                            WHERE user_id = ? AND message_type = 'user'
-                        )
-              ))
-    ''', (user_id, user_id))
-    return result.rowcount if hasattr(result, 'rowcount') else 0
+async def clear_user_history() -> int:
+    # Count rows before deletion
+    messages_count = await execute_query('SELECT COUNT(*) FROM messages', fetchone=True)
+    comments_count = await execute_query('SELECT COUNT(*) FROM comments', fetchone=True)
+    
+    total_rows = messages_count[0] + comments_count[0]
+
+    # Clear messages table
+    await execute_query('DELETE FROM messages')
+
+    # Clear comments table
+    await execute_query('DELETE FROM comments')
+
+    return total_rows
 
 async def count_user_history(user_id: int) -> int:
     result = await execute_query('''
@@ -60,8 +58,8 @@ async def count_user_history(user_id: int) -> int:
                   SELECT m2.id 
                   FROM messages m2 
                   WHERE m2.message_type = 'bot' AND 
-                        m2.timestamp > (
-                            SELECT MAX(timestamp) 
+                        m2.timestamp >= (
+                            SELECT MIN(timestamp) 
                             FROM messages 
                             WHERE user_id = ? AND message_type = 'user'
                         )
