@@ -177,3 +177,146 @@ https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+app
 https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+applications.commands&permissions=1759753328392256
 2024-10-12 10:40:26,617 [INFO] Successfully synced 8 commands globally.
 2024-10-12 10:40:54,336 [INFO] Bot script execution completed.
+2024-10-12 10:51:17,536 [INFO] Starting bot initialization...
+2024-10-12 10:51:17,537 [INFO] Environment variables loaded.
+2024-10-12 10:51:17,537 [INFO] Setting up bot...
+2024-10-12 10:51:17,537 [INFO] Initializing bot...
+2024-10-12 10:51:17,538 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:51:50,057 [INFO] Starting bot initialization...
+2024-10-12 10:51:50,058 [INFO] Environment variables loaded.
+2024-10-12 10:51:50,058 [INFO] Setting up bot...
+2024-10-12 10:51:50,058 [INFO] Initializing bot...
+2024-10-12 10:51:50,059 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:52:20,236 [INFO] Starting bot initialization...
+2024-10-12 10:52:20,237 [INFO] Environment variables loaded.
+2024-10-12 10:52:20,237 [INFO] Setting up bot...
+2024-10-12 10:52:20,237 [INFO] Initializing bot...
+2024-10-12 10:52:20,238 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:52:20,239 [INFO] DISCORD_TOKEN found. Attempting to run bot...
+2024-10-12 10:52:20,240 [INFO] logging in using static token
+2024-10-12 10:52:21,013 [INFO] Shard ID None has connected to Gateway (Session ID: e09df7035c674dcb2fe6fe0cb06344ff).
+2024-10-12 10:52:23,017 [INFO] Logged in as BotBuddy
+2024-10-12 10:52:23,018 [INFO] User ID: 1294507937989136456
+2024-10-12 10:52:23,018 [INFO] Bot is ready!
+2024-10-12 10:52:23,019 [INFO] Generating invite link...
+2024-10-12 10:52:23,019 [INFO] CLIENT_ID found: 1294507937989136456
+2024-10-12 10:52:23,019 [INFO] Bot invite link with required permissions:
+https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+applications.commands&permissions=1759753328392256
+2024-10-12 10:52:23,402 [INFO] Successfully synced 8 commands globally.
+2024-10-12 10:54:24,435 [INFO] Starting bot initialization...
+2024-10-12 10:54:24,436 [INFO] Environment variables loaded.
+2024-10-12 10:54:24,436 [INFO] Setting up bot...
+2024-10-12 10:54:24,436 [INFO] Initializing bot...
+2024-10-12 10:54:24,438 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:54:24,439 [INFO] DISCORD_TOKEN found. Attempting to run bot...
+2024-10-12 10:54:24,440 [INFO] logging in using static token
+2024-10-12 10:54:25,020 [INFO] Shard ID None has connected to Gateway (Session ID: 8fa50800f81d8cd7f1394e85c2b05500).
+2024-10-12 10:54:27,026 [INFO] Logged in as BotBuddy
+2024-10-12 10:54:27,027 [INFO] User ID: 1294507937989136456
+2024-10-12 10:54:27,027 [INFO] Bot is ready!
+2024-10-12 10:54:27,027 [INFO] Generating invite link...
+2024-10-12 10:54:27,028 [INFO] CLIENT_ID found: 1294507937989136456
+2024-10-12 10:54:27,028 [INFO] Bot invite link with required permissions:
+https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+applications.commands&permissions=1759753328392256
+2024-10-12 10:54:27,447 [INFO] Successfully synced 8 commands globally.
+2024-10-12 10:54:36,507 [ERROR] Ignoring exception in command 'history'
+Traceback (most recent call last):
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/commands.py", line 858, in _do_call
+    return await self._callback(interaction, **params)  # type: ignore
+  File "/home/marie/Documents/discord_openrouter_bot/commands/history_command.py", line 9, in history
+    chat_history = get_history(interaction.client.cursor, user_id, limit)
+AttributeError: 'Bot' object has no attribute 'cursor'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/tree.py", line 1310, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/commands.py", line 883, in _invoke_with_namespace
+    return await self._do_call(interaction, transformed_values)
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/commands.py", line 876, in _do_call
+    raise CommandInvokeError(self, e) from e
+discord.app_commands.errors.CommandInvokeError: Command 'history' raised an exception: AttributeError: 'Bot' object has no attribute 'cursor'
+2024-10-12 10:55:21,921 [INFO] Starting bot initialization...
+2024-10-12 10:55:21,921 [INFO] Environment variables loaded.
+2024-10-12 10:55:21,922 [INFO] Setting up bot...
+2024-10-12 10:55:21,922 [INFO] Initializing bot...
+2024-10-12 10:55:21,923 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:55:21,924 [INFO] DISCORD_TOKEN found. Attempting to run bot...
+2024-10-12 10:55:21,925 [INFO] logging in using static token
+2024-10-12 10:55:22,515 [INFO] Shard ID None has connected to Gateway (Session ID: fbbeae4031f5f8a3b4de0ac8075606b4).
+2024-10-12 10:55:24,521 [INFO] Logged in as BotBuddy
+2024-10-12 10:55:24,521 [INFO] User ID: 1294507937989136456
+2024-10-12 10:55:24,522 [INFO] Bot is ready!
+2024-10-12 10:55:24,522 [INFO] Generating invite link...
+2024-10-12 10:55:24,523 [INFO] CLIENT_ID found: 1294507937989136456
+2024-10-12 10:55:24,523 [INFO] Bot invite link with required permissions:
+https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+applications.commands&permissions=1759753328392256
+2024-10-12 10:55:24,853 [INFO] Successfully synced 8 commands globally.
+2024-10-12 10:56:00,366 [ERROR] Ignoring exception in command 'clear'
+Traceback (most recent call last):
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/commands.py", line 858, in _do_call
+    return await self._callback(interaction, **params)  # type: ignore
+  File "/home/marie/Documents/discord_openrouter_bot/core/command_registration.py", line 55, in clear_command
+    await clear(interaction)
+  File "/home/marie/Documents/discord_openrouter_bot/commands/general_commands.py", line 40, in clear
+    rows_deleted = clear_user_history(bot.db_cursor, interaction.user.id)
+AttributeError: 'Bot' object has no attribute 'db_cursor'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/tree.py", line 1310, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/commands.py", line 883, in _invoke_with_namespace
+    return await self._do_call(interaction, transformed_values)
+  File "/home/marie/.pyenv/versions/3.10.13/lib/python3.10/site-packages/discord/app_commands/commands.py", line 876, in _do_call
+    raise CommandInvokeError(self, e) from e
+discord.app_commands.errors.CommandInvokeError: Command 'clear' raised an exception: AttributeError: 'Bot' object has no attribute 'db_cursor'
+2024-10-12 10:56:39,861 [INFO] Starting bot initialization...
+2024-10-12 10:56:39,862 [INFO] Environment variables loaded.
+2024-10-12 10:56:39,862 [INFO] Setting up bot...
+2024-10-12 10:56:39,862 [INFO] Initializing bot...
+2024-10-12 10:56:39,863 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:56:39,865 [INFO] DISCORD_TOKEN found. Attempting to run bot...
+2024-10-12 10:56:39,866 [INFO] logging in using static token
+2024-10-12 10:56:40,683 [INFO] Shard ID None has connected to Gateway (Session ID: d6865d6ae40e49d30e8cf84816690814).
+2024-10-12 10:56:42,689 [INFO] Logged in as BotBuddy
+2024-10-12 10:56:42,689 [INFO] User ID: 1294507937989136456
+2024-10-12 10:56:42,690 [INFO] Bot is ready!
+2024-10-12 10:56:42,690 [INFO] Generating invite link...
+2024-10-12 10:56:42,691 [INFO] CLIENT_ID found: 1294507937989136456
+2024-10-12 10:56:42,691 [INFO] Bot invite link with required permissions:
+https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+applications.commands&permissions=1759753328392256
+2024-10-12 10:56:42,953 [INFO] Successfully synced 8 commands globally.
+2024-10-12 10:56:57,478 [INFO] Bot mentioned in message: <@1294507937989136456> salut ça vaaaaaa
+2024-10-12 10:56:57,479 [INFO] AI command called with message: salut ça vaaaaaa
+2024-10-12 10:56:57,480 [INFO] User ID: 451176341740716042
+2024-10-12 10:56:57,481 [INFO] Using model: None, max_tokens: None
+2024-10-12 10:56:59,215 [INFO] AI response generated: Bonjour! Oui, ça va bien, merci! Et toi?...
+2024-10-12 10:56:59,215 [INFO] Sending response via channel.send
+2024-10-12 10:56:59,378 [INFO] Response sent successfully
+2024-10-12 10:57:59,327 [INFO] Starting bot initialization...
+2024-10-12 10:57:59,328 [INFO] Environment variables loaded.
+2024-10-12 10:57:59,328 [INFO] Setting up bot...
+2024-10-12 10:57:59,328 [INFO] Initializing bot...
+2024-10-12 10:57:59,329 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2024-10-12 10:57:59,330 [INFO] DISCORD_TOKEN found. Attempting to run bot...
+2024-10-12 10:57:59,331 [INFO] logging in using static token
+2024-10-12 10:58:00,003 [INFO] Shard ID None has connected to Gateway (Session ID: 68217083c17fd415c2fe0c35d0f61630).
+2024-10-12 10:58:02,009 [INFO] Logged in as BotBuddy
+2024-10-12 10:58:02,009 [INFO] User ID: 1294507937989136456
+2024-10-12 10:58:02,010 [INFO] Bot is ready!
+2024-10-12 10:58:02,010 [INFO] Generating invite link...
+2024-10-12 10:58:02,010 [INFO] CLIENT_ID found: 1294507937989136456
+2024-10-12 10:58:02,011 [INFO] Bot invite link with required permissions:
+https://discord.com/oauth2/authorize?client_id=1294507937989136456&scope=bot+applications.commands&permissions=1759753328392256
+2024-10-12 10:58:02,561 [INFO] Successfully synced 8 commands globally.
+2024-10-12 11:00:28,541 [INFO] Bot mentioned in message: <@1294507937989136456> elle est bella la vie non???
+2024-10-12 11:00:28,541 [INFO] AI command called with message: elle est bella la vie non???
+2024-10-12 11:00:28,543 [INFO] User ID: 451176341740716042
+2024-10-12 11:00:28,544 [INFO] Using model: None, max_tokens: None
+2024-10-12 11:00:31,665 [INFO] AI response generated: La vie... belle, tu dis? Je ne sais plus, peut-êtr...
+2024-10-12 11:00:31,665 [INFO] Sending response via channel.send
+2024-10-12 11:00:31,873 [INFO] Response sent successfully
+2024-10-12 11:00:53,081 [INFO] Bot script execution completed.

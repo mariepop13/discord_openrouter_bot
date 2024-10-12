@@ -3,11 +3,42 @@ from discord import app_commands
 from commands.ai_preferences import set_ai_preferences_command
 from commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
 from commands.general_commands import clear, ping
+from commands.history_command import history
 from core.help_command import help_command
 from utils.models import MODELS
+from typing import Optional
+
+class AIOption(discord.Enum):
+    personality = "personality"
+    tone = "tone"
+    language = "language"
+    prebuild = "prebuild"
+    model = "model"
+    max_tokens = "max_tokens"
+    custom = "custom"
 
 def register_commands(bot):
-    bot.tree.command(name="set_ai_preferences", description="Set AI preferences")(set_ai_preferences_command)
+    @bot.tree.command(name="set_ai_preferences", description="Set AI preferences")
+    @app_commands.describe(
+        option="The AI option to set",
+        value="The value to set for the chosen option",
+        custom_option="If 'custom' is selected, specify the custom option here"
+    )
+    async def set_ai_preferences_wrapper(
+        interaction: discord.Interaction, 
+        option: AIOption,
+        value: str,
+        custom_option: Optional[str] = None
+    ):
+        if option == AIOption.custom:
+            if custom_option is None:
+                await interaction.response.send_message("Please provide a custom option when selecting 'custom'.", ephemeral=True)
+                return
+            option = custom_option
+        else:
+            option = option.value
+        
+        await set_ai_preferences_command(interaction, option, value)
 
     @bot.tree.command(name="analyze", description="Analyze an attached image")
     async def analyze(interaction: discord.Interaction, image: discord.Attachment):
@@ -42,3 +73,6 @@ def register_commands(bot):
     async def ping_command(interaction: discord.Interaction):
         await interaction.response.defer()
         await ping(interaction)
+
+    # Register the new history command
+    bot.tree.add_command(history)

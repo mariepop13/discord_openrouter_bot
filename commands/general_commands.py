@@ -1,5 +1,5 @@
 import discord
-from utils.database import clear_user_history
+from utils.database import clear_user_history, setup_database
 
 async def ping(interaction: discord.Interaction):
     await interaction.followup.send('Pong!')
@@ -36,8 +36,10 @@ async def clear(interaction: discord.Interaction):
         await interaction.followup.send("Sorry, you are not authorized to use this command.", ephemeral=True)
         return
 
-    bot = interaction.client
-    rows_deleted = clear_user_history(bot.db_cursor, interaction.user.id)
-    bot.db_conn.commit()
-
-    await interaction.followup.send(f"Your command history has been cleared. {rows_deleted} entries have been deleted.", ephemeral=True)
+    conn, cursor = setup_database()
+    try:
+        rows_deleted = clear_user_history(cursor, interaction.user.id)
+        conn.commit()
+        await interaction.followup.send(f"Your command history has been cleared. {rows_deleted} entries have been deleted.", ephemeral=True)
+    finally:
+        conn.close()

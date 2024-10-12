@@ -4,7 +4,6 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from commands.ai_chat import ai_command
 from commands.image_analysis import analyze_image_command
-from commands.ai_preferences import set_ai_option, set_ai_preferences_command
 from utils.database import setup_database
 import logging
 
@@ -53,10 +52,5 @@ def initialize_bot():
                 await message.channel.send("Sorry, I encountered an error while processing your request.")
         
         await bot.process_commands(message)
-
-    # Register slash commands
-    @bot.tree.command(name="set_ai_option", description="Set AI preferences")
-    async def set_option(interaction: discord.Interaction, option: str, value: str):
-        await set_ai_option(interaction, option, value)
 
     return bot
