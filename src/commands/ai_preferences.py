@@ -1,7 +1,7 @@
 from typing import Optional
 import discord
-from utils.database_operations import set_personalization, set_ai_preferences
-from utils.models import MODELS
+from src.database.database_operations import set_personalization, set_ai_preferences
+from src.utils.models import MODELS
 
 # Constants for option names
 PERSONALITY = 'personality'

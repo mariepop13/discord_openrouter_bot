@@ -1,6 +1,6 @@
 import discord
 from discord import Interaction
-from utils.database_operations import clear_user_history
+from src.database.database_operations import clear_user_history
 import logging
 from typing import Optional
 

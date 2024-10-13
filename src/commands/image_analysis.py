@@ -1,5 +1,5 @@
 import discord
-from utils.api_utils import analyze_image
+from src.utils.api_utils import analyze_image
 import logging
 
 async def analyze_image_command(ctx, image: discord.Attachment):

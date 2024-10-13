@@ -1,12 +1,12 @@
 import discord
 from discord import app_commands
-from commands.ai_preferences import update_ai_settings
-from commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
-from commands.general_commands import clear, ping, help_command
-from commands.history_command import history
-from commands.ai_chat import ai_command
+from src.commands.ai_preferences import update_ai_settings
+from src.commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
+from src.commands.general_commands import clear, ping, help_command
+from src.commands.history_command import history
+from src.commands.ai_chat import ai_command
 from typing import Optional
-from utils.models import MODELS
+from src.utils.models import MODELS
 
 class AIOption(discord.Enum):
     personality = "personality"

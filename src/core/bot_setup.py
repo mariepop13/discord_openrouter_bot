@@ -1,7 +1,7 @@
 import asyncio
-from core.bot_initialization import initialize_bot
-from core.command_registration import register_commands
-from utils.database_schema import setup_database
+from src.core.bot_initialization import initialize_bot
+from src.core.command_registration import register_commands
+from src.database.database_schema import setup_database
 
 def setup_bot():
     print("Setting up bot in bot_setup.py...")

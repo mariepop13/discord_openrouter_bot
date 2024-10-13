@@ -1,10 +1,10 @@
 import os
 from dotenv import load_dotenv
-from core.bot_initialization import initialize_bot
-from commands.ai_chat import ai_command
-from commands.history_command import history
-from commands.image_commands import generate_image, analyze_image
-from utils.models import MODELS
+from src.core.bot_initialization import initialize_bot
+from src.commands.ai_chat import ai_command
+from src.commands.history_command import history
+from src.commands.image_commands import generate_image, analyze_image
+from src.utils.models import MODELS
 
 # Load environment variables
 load_dotenv()

@@ -1,6 +1,6 @@
 import discord
-from utils.api_utils import chat_with_ai
-from utils.database_operations import get_personalization, get_ai_preferences, insert_message, get_history
+from src.utils.api_utils import chat_with_ai
+from src.database.database_operations import get_personalization, get_ai_preferences, insert_message, get_history
 import logging
 import os
 from collections import defaultdict

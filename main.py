@@ -1,7 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
-from core.bot_setup import setup_bot
+from src.core.bot_setup import setup_bot
 import logging
 
 def configure_logging():

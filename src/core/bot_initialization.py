@@ -2,7 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from commands.ai_chat import ai_command
+from src.commands.ai_chat import ai_command
 import logging
 
 def create_bot():

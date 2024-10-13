@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from utils.database_operations import get_history
+from src.database.database_operations import get_history
 from datetime import datetime
 import logging
 import os

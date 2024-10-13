@@ -1,6 +1,6 @@
 import discord
 import asyncio
-from utils.api_utils import generate_image
+from src.utils.api_utils import generate_image
 
 async def generate_image_command(interaction: discord.Interaction, prompt: str, bot):
     await interaction.followup.send("Generating image... This may take a few minutes.")
@@ -31,7 +31,7 @@ async def image_generation_help(interaction: discord.Interaction):
     await interaction.followup.send(help_text)
 
 async def analyze_image_command(interaction: discord.Interaction, image: discord.Attachment):
-    # This function is already implemented in ai_commands.py
+    # This function is already implemented in image_analysis.py
     # We're keeping it here for consistency, but you may want to move it to this file in the future
-    from commands.ai_commands import analyze_image_command as analyze_image_impl
+    from src.commands.image_analysis import analyze_image_command as analyze_image_impl
     await analyze_image_impl(interaction, image)
