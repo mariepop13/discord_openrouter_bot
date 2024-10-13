@@ -7,12 +7,12 @@ from typing import Optional
 async def send_message(interaction: Interaction, content: str, ephemeral: bool = True, embed: Optional[discord.Embed] = None):
     try:
         if embed:
-            await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
+            await interaction.response.send_message(content=content, embed=embed, ephemeral=ephemeral)
         else:
             await interaction.response.send_message(content, ephemeral=ephemeral)
     except discord.errors.NotFound:
         if embed:
-            await interaction.followup.send(embed=embed, ephemeral=ephemeral)
+            await interaction.followup.send(content=content, embed=embed, ephemeral=ephemeral)
         else:
             await interaction.followup.send(content, ephemeral=ephemeral)
 
@@ -20,18 +20,22 @@ async def ping(interaction: Interaction):
     await send_message(interaction, 'Pong!', ephemeral=False)
 
 async def help_command(interaction: Interaction):
-    help_embed = discord.Embed(title="Bot Commands", color=discord.Color.blue())
+    help_embed = discord.Embed(title="Discord OpenRouter Bot", color=discord.Color.blue())
     
+    help_embed.description = ("This bot uses OpenRouter.ai API to interact with various AI models, "
+                              "analyze images, and generate images using Replicate. "
+                              "The bot responds when mentioned and uses the following commands:")
+
     commands = {
         "General Commands": [
             ("/help", "Show this help message"),
             ("/ping", "Check if the bot is responsive"),
-            ("/clear", "Clear all conversation history"),
-            ("/sync", "Synchronize slash commands (Admin only)")
+            ("/clear", "Clear all conversation history")
         ],
         "AI Commands": [
             ("/ai [message]", "Chat with the AI"),
-            ("/analyze [image]", "Analyze an attached image")
+            ("/analyze [image]", "Analyze an attached image"),
+            ("/update_ai_settings", "Update AI settings (model, personality, tone, language, max tokens)")
         ],
         "Image Commands": [
             ("/generate_image [prompt]", "Generate an image based on a prompt"),
@@ -46,7 +50,16 @@ async def help_command(interaction: Interaction):
             inline=False
         )
     
-    await send_message(interaction, embed=help_embed, ephemeral=False)
+    help_embed.add_field(
+        name="Usage Examples",
+        value=("• Chat with AI: `/ai Hello, how are you?`\n"
+               "• Analyze an image: `/analyze` (attach an image to your message)\n"
+               "• Generate an image: `/generate_image A beautiful sunset over the ocean`\n"
+               "• Update AI settings: `/update_ai_settings model:openai/gpt-4o option:max_tokens value:2000`"),
+        inline=False
+    )
+    
+    await send_message(interaction, content="", embed=help_embed, ephemeral=False)
 
 async def clear(interaction: Interaction):
     try:

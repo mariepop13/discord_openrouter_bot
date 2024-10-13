@@ -31,27 +31,29 @@ The bot responds when it is mentioned (@bot_name) in a message or when specific 
 
 ## Available Commands
 
-- `/ai`: Main command for interacting with the AI. It has the following subcommands:
-  - `chat`: Chat with the AI
-  - `set_personality`: Set the AI's personality for chat
-  - `set_tone`: Set the AI's tone for chat
-  - `set_language`: Set the preferred language for AI chat
-  - `analyze_image`: Analyze an image using AI
-  - `generate_image`: Generate an image based on a prompt
+### General Commands
+- `/help`: Show the help message with all available commands
+- `/ping`: Check if the bot is responsive
+- `/clear`: Clear all conversation history
 
-  Usage examples:
-  ```
-  /ai chat message:"Hello, how are you?" model:openai/gpt-3.5-turbo max_tokens:100
-  /ai set_personality personality:"friendly and helpful"
-  /ai set_tone tone:"professional"
-  /ai set_language language:"French"
-  /ai analyze_image [attach an image]
-  /ai generate_image prompt:"A beautiful sunset over the ocean"
-  ```
+### AI Commands
+- `/ai [message]`: Chat with the AI
+- `/analyze [image]`: Analyze an attached image
+- `/update_ai_settings`: Update AI settings (model, personality, tone, language, max tokens)
 
-- `/history`: Get your chat history
-- `/models`: List available AI models
-- `/help`: Display help information about available commands
+### Image Commands
+- `/generate_image [prompt]`: Generate an image based on a prompt
+- `/image_help`: Get help with image generation commands
+
+## Usage Examples
+
+- Chat with AI: `/ai Hello, how are you?`
+- Analyze an image: `/analyze` (attach an image to your message)
+- Generate an image: `/generate_image A beautiful sunset over the ocean`
+- Update AI settings:
+  - Set only the model: `/update_ai_settings model:gpt-openai/gpt-4o`
+  - Set an option and value: `/update_ai_settings option:tone value:professional`
+  - Set both model and an option: `/update_ai_settings model:openai/gpt-4o option:max_tokens value:2000`
 
 ## Contributing
 

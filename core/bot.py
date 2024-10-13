@@ -4,22 +4,13 @@ from core.bot_initialization import initialize_bot
 from commands.ai_chat import ai_command
 from commands.history_command import history
 from commands.image_commands import generate_image, analyze_image
+from utils.models import MODELS
 
 # Load environment variables
 load_dotenv()
 
 # Initialize the bot
 bot = initialize_bot()
-
-# Available models (consider moving this to a config file)
-MODELS = [
-    "google/gemini-flash-1.5",
-    "openai/gpt-3.5-turbo",
-    "openai/gpt-4",
-    "anthropic/claude-2",
-    "google/palm-2-chat-bison",
-    "meta-llama/llama-2-70b-chat"
-]
 
 @bot.tree.command(name="models", description="List available AI models")
 async def list_models(interaction):

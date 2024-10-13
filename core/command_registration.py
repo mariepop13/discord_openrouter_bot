@@ -1,18 +1,18 @@
 import discord
 from discord import app_commands
-from commands.ai_preferences import set_ai_preferences_command
+from commands.ai_preferences import update_ai_settings
 from commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
 from commands.general_commands import clear, ping, help_command
 from commands.history_command import history
 from commands.ai_chat import ai_command
 from typing import Optional
+from utils.models import MODELS
 
 class AIOption(discord.Enum):
     personality = "personality"
     tone = "tone"
     language = "language"
     prebuild = "prebuild"
-    model = "model"
     max_tokens = "max_tokens"
     custom = "custom"
 
@@ -23,23 +23,23 @@ def register_commands(bot):
     async def ai_command_wrapper(interaction: discord.Interaction, message: str):
         await ai_command(interaction, message)
 
-    @bot.tree.command(name="set_ai_preferences", description="Set AI preferences")
+    @bot.tree.command(name="update_ai_settings", description="Update AI settings")
     @app_commands.describe(
-        option="The AI option to set",
-        value="The value to set for the chosen option",
+        option="The AI option to set (optional)",
+        value="The value to set for the chosen option (optional)",
+        model="The AI model to use",
         custom_option="If 'custom' is selected, specify the custom option here"
     )
-    async def set_ai_preferences_wrapper(
+    @app_commands.choices(model=[app_commands.Choice(name=model, value=model) for model in MODELS])
+    async def update_ai_settings_wrapper(
         interaction: discord.Interaction, 
-        option: AIOption,
-        value: str,
+        model: Optional[str] = None,
+        option: Optional[AIOption] = None,
+        value: Optional[str] = None,
         custom_option: Optional[str] = None
     ):
-        option = custom_option if option == AIOption.custom else option.value
-        if option == AIOption.custom and not custom_option:
-            await interaction.response.send_message("Please provide a custom option when selecting 'custom'.", ephemeral=True)
-            return
-        await set_ai_preferences_command(interaction, option, value)
+        option_value = custom_option if option == AIOption.custom else option.value if option else None
+        await update_ai_settings(interaction, option_value, value, model)
 
     # Image Commands
     @bot.tree.command(name="analyze", description="Analyze an attached image")
