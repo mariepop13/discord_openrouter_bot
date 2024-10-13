@@ -12,15 +12,19 @@ async def create_tables():
             model TEXT,
             message_type TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-        
+        )
+    ''')
+    
+    await execute_query('''
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             content TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-        
+        )
+    ''')
+    
+    await execute_query('''
         CREATE TABLE IF NOT EXISTS personalization (
             user_id INTEGER PRIMARY KEY,
             personality TEXT,
@@ -28,7 +32,7 @@ async def create_tables():
             language TEXT,
             ai_model TEXT,
             max_output INTEGER
-        );
+        )
     ''')
 
 async def run_migrations():

@@ -9,13 +9,20 @@ This Discord bot uses OpenRouter.ai API to interact with various AI models, anal
    ```
    pip install -r requirements.txt
    ```
-3. Create a `.env` file in the project root and add the following:
+3. Copy the `.env.template` file to create a new `.env` file:
+   ```
+   cp .env.template .env
+   ```
+4. Open the `.env` file and add the following:
    ```
    DISCORD_TOKEN=your_discord_bot_token
    OPENROUTER_API_KEY=your_openrouter_api_key
    REPLICATE_API_TOKEN=your_replicate_api_token
+   CLIENT_ID=your_discord_client_id
    ```
-4. Replace `your_discord_bot_token`, `your_openrouter_api_key`, and `your_replicate_api_token` with your actual tokens.
+5. Replace `your_discord_bot_token`, `your_openrouter_api_key`, `your_replicate_api_token`, and `your_discord_client_id` with your actual tokens.
+
+   Note: The `.env` file is crucial for the bot's operation. Make sure to keep it secure and never share it publicly.
 
 ## Running the Bot
 

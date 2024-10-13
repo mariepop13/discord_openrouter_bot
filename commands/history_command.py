@@ -55,10 +55,11 @@ async def show_history_page(interaction: discord.Interaction, user_id: int, page
         chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
         
         if not chat_history:
-            if page == 1:
-                await interaction.response.send_message("You don't have any chat history yet.", ephemeral=True)
+            content = "You don't have any chat history yet." if page == 1 else "No more history to show."
+            if interaction.response.is_done():
+                await interaction.followup.send(content, ephemeral=True)
             else:
-                await interaction.response.send_message("No more history to show.", ephemeral=True)
+                await interaction.response.send_message(content, ephemeral=True)
             return
         
         formatted_history = "\n\n".join([format_message(*message) for message in chat_history])
@@ -67,13 +68,12 @@ async def show_history_page(interaction: discord.Interaction, user_id: int, page
         total_messages = await get_history(user_id, count_only=True)
         total_pages = (total_messages + MESSAGES_PER_PAGE - 1) // MESSAGES_PER_PAGE
 
-        for i, chunk in enumerate(chunks):
-            embed = discord.Embed(
-                title=f"Your Chat History (Page {page}/{total_pages})",
-                description=chunk,
-                color=discord.Color.blue()
-            )
-            embed.set_footer(text=f"Showing messages {offset + 1}-{min(offset + MESSAGES_PER_PAGE, total_messages)} out of {total_messages}")
+        embed = discord.Embed(
+            title=f"Your Chat History (Page {page}/{total_pages})",
+            description=chunks[0],
+            color=discord.Color.blue()
+        )
+        embed.set_footer(text=f"Showing messages {offset + 1}-{min(offset + MESSAGES_PER_PAGE, total_messages)} out of {total_messages}")
         
         view = HistoryPaginationView(user_id, page, total_pages)
         view.update_buttons()
@@ -85,7 +85,10 @@ async def show_history_page(interaction: discord.Interaction, user_id: int, page
 
     except Exception as e:
         logging.error(f"Error in history command for user {user_id}: {str(e)}")
-        await interaction.response.send_message("An error occurred while fetching your chat history. Please try again later.", ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send("An error occurred while fetching your chat history. Please try again later.", ephemeral=True)
+        else:
+            await interaction.response.send_message("An error occurred while fetching your chat history. Please try again later.", ephemeral=True)
 
 @app_commands.command(name="history", description="View your chat history")
 async def history(interaction: discord.Interaction, page: int = 1):
