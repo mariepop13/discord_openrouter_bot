@@ -8,10 +8,13 @@ from src.utils.logging_utils import get_logger
 logger = get_logger(__name__)
 
 def create_bot():
+    logger.info("Creating bot with default intents...")
     load_dotenv()
     intents = discord.Intents.default()
     intents.message_content = True
-    return commands.Bot(command_prefix='!', intents=intents)
+    bot = commands.Bot(command_prefix='!', intents=intents)
+    logger.info("Bot created successfully.")
+    return bot
 
 def initialize_bot():
     logger.info("Initializing bot...")
@@ -19,6 +22,7 @@ def initialize_bot():
 
     @bot.event
     async def on_ready():
+        logger.info("Bot is ready.")
         logger.info(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
         
         client_id = os.getenv('CLIENT_ID')
@@ -37,14 +41,18 @@ def initialize_bot():
 
     @bot.event
     async def on_message(message):
+        logger.info(f"Received message: {message.content} from {message.author}")
         if bot.user.mentioned_in(message) and not message.mention_everyone and not message.content.startswith('/'):
             content = message.content.replace(f'<@{bot.user.id}>', '').strip()
+            logger.info(f"Bot was mentioned. Processing message: {content}")
             try:
                 await ai_command(message, content)
+                logger.info("ai_command executed successfully.")
             except Exception as e:
                 logger.error(f"Error in ai_command: {e}")
                 await message.channel.send("Sorry, I encountered an error while processing your request.")
         
         await bot.process_commands(message)
+        logger.info("Processed commands for the message.")
 
     return bot
