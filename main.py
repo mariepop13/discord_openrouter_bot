@@ -1,12 +1,16 @@
 import os
 import sys
 from dotenv import load_dotenv
+from datetime import datetime
 from src.core.bot_setup import setup_bot
 from src.utils.logging_utils import setup_logging, get_logger
 
 def main():
-    # Créer un chemin absolu pour le fichier de log
-    log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs', 'app.log')
+    # Créer un horodatage unique
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    # Créer un chemin absolu pour le fichier de log avec horodatage
+    log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs', f'app_{timestamp}.log')
     
     logger = setup_logging(log_file)
     logger.info("Starting bot initialization...")
