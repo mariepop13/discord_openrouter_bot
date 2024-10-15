@@ -1,6 +1,13 @@
 import discord
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 async def help_command(interaction: discord.Interaction):
+    logger.info("Executing help_command")
+
     embed = discord.Embed(title="Bot Commands", color=discord.Color.blue())
     
     general_commands = [
@@ -25,4 +32,6 @@ async def help_command(interaction: discord.Interaction):
     embed.add_field(name="AI Commands", value="\n".join([f"`{cmd}`: {desc}" for cmd, desc in ai_commands]), inline=False)
     embed.add_field(name="Image Commands", value="\n".join([f"`{cmd}`: {desc}" for cmd, desc in image_commands]), inline=False)
     
+    logger.info("Sending help embed")
     await interaction.response.send_message(embed=embed)
+    logger.info("Help embed sent successfully")

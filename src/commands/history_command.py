@@ -6,6 +6,9 @@ import logging
 import os
 from discord.ui import View, Button
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # These could be moved to a config file
 MAX_MESSAGE_LENGTH = 500
 MAX_EMBED_LENGTH = 4000
@@ -51,6 +54,7 @@ class HistoryPaginationView(View):
 
 async def show_history_page(interaction: discord.Interaction, user_id: int, page: int = 1):
     try:
+        logging.info(f"Fetching history for user {user_id}, page {page}")
         offset = (page - 1) * MESSAGES_PER_PAGE
         chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
         
@@ -60,6 +64,7 @@ async def show_history_page(interaction: discord.Interaction, user_id: int, page
                 await interaction.followup.send(content, ephemeral=True)
             else:
                 await interaction.response.send_message(content, ephemeral=True)
+            logging.info(f"No chat history found for user {user_id}, page {page}")
             return
         
         formatted_history = "\n\n".join([format_message(*message) for message in chat_history])
@@ -82,6 +87,8 @@ async def show_history_page(interaction: discord.Interaction, user_id: int, page
             await interaction.edit_original_response(embed=embed, view=view)
         else:
             await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+        
+        logging.info(f"Successfully fetched and displayed history for user {user_id}, page {page}")
 
     except Exception as e:
         logging.error(f"Error in history command for user {user_id}: {str(e)}")
@@ -92,8 +99,10 @@ async def show_history_page(interaction: discord.Interaction, user_id: int, page
 
 @app_commands.command(name="history", description="View your chat history")
 async def history(interaction: discord.Interaction, page: int = 1):
+    logging.info(f"History command invoked by user {interaction.user.id}, page {page}")
     await interaction.response.defer(ephemeral=True)
     await show_history_page(interaction, interaction.user.id, page)
 
 async def setup(bot):
     bot.tree.add_command(history)
+    logging.info("History command added to bot")

@@ -3,6 +3,7 @@ from .database_connection import execute_query
 import logging
 
 async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only: bool = False) -> Any:
+    logging.info(f"Fetching history for user_id={user_id}, limit={limit}, offset={offset}, count_only={count_only}")
     try:
         if count_only:
             query = '''
@@ -21,7 +22,9 @@ async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only
                       ))
             '''
             result = await execute_query(query, (user_id, user_id), fetchone=True)
-            return result[0] if result else 0
+            count = result[0] if result else 0
+            logging.info(f"Count result for user_id={user_id}: {count}")
+            return count
         else:
             query = '''
                 SELECT user_id, content, model, message_type, timestamp 
@@ -42,24 +45,27 @@ async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only
                     CASE WHEN message_type = 'user' THEN 1 ELSE 0 END
                 LIMIT ? OFFSET ?
             '''
-            return await execute_query(query, (user_id, user_id, limit, offset))
+            result = await execute_query(query, (user_id, user_id, limit, offset))
+            logging.info(f"History result for user_id={user_id}: {result}")
+            return result
     except Exception as e:
-        logging.error(f"Error getting history: {str(e)}")
+        logging.error(f"Error getting history for user_id={user_id}: {str(e)}")
         return [] if not count_only else 0
 
 async def clear_user_history() -> int:
+    logging.info("Clearing user history")
     try:
-        # Count rows before deletion
         messages_count = await execute_query('SELECT COUNT(*) FROM messages', fetchone=True)
         comments_count = await execute_query('SELECT COUNT(*) FROM comments', fetchone=True)
         
         total_rows = messages_count[0] + comments_count[0]
+        logging.info(f"Total rows to delete: {total_rows}")
 
-        # Clear messages table
         await execute_query('DELETE FROM messages')
+        logging.info("Messages table cleared")
 
-        # Clear comments table
         await execute_query('DELETE FROM comments')
+        logging.info("Comments table cleared")
 
         return total_rows
     except Exception as e:
@@ -67,8 +73,11 @@ async def clear_user_history() -> int:
         raise
 
 async def count_user_history(user_id: int) -> int:
+    logging.info(f"Counting history for user_id={user_id}")
     try:
-        return await get_history(user_id, count_only=True)
+        count = await get_history(user_id, count_only=True)
+        logging.info(f"Counted history for user_id={user_id}: {count}")
+        return count
     except Exception as e:
-        logging.error(f"Error counting user history: {str(e)}")
+        logging.error(f"Error counting user history for user_id={user_id}: {str(e)}")
         return 0
