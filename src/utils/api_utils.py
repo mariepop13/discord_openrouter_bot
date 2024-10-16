@@ -9,7 +9,7 @@ async def chat_with_ai(messages, max_tokens):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "HTTP-Referer": "https://github.com/yourusername/your-repo",  # Replace with your GitHub repo or actual domain
-        "X-Title": "Discord Image Analysis Bot",  # Replace with your actual bot name
+        "X-Title": os.getenv('BOT_NAME'),
         "Content-Type": "application/json"
     }
     data = {
@@ -37,7 +37,7 @@ async def analyze_image(image_url, chat_history=None):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "HTTP-Referer": "https://github.com/yourusername/your-repo",  # Replace with your GitHub repo or actual domain
-        "X-Title": "Discord Image Analysis Bot",  # Replace with your actual bot name
+        "X-Title": os.getenv('BOT_NAME'),
         "Content-Type": "application/json"
     }
 
