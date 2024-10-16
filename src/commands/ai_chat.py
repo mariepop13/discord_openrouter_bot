@@ -51,10 +51,10 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
     user_id = ctx.author.id if hasattr(ctx, 'author') else ctx.user.id
 
     if is_on_cooldown(user_id):
-        logging.info(f"User {user_id} is on cooldown. Command ignored.")
+        logging.debug(f"User {user_id} is on cooldown. Command ignored.")
         return
 
-    logging.info(f"AI command called for user {user_id}")
+    logging.debug(f"AI command called for user {user_id}")
     
     is_interaction = isinstance(ctx, discord.Interaction)
     if is_interaction:

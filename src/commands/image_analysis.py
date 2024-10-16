@@ -21,7 +21,7 @@ def format_chat_history(history):
 
 async def analyze_image_command(ctx, image: discord.Attachment):
     try:
-        logger.info("Received image for analysis: %s", image.filename)
+        logger.debug("Received image for analysis: %s", image.filename)
         image_url = image.url
 
         user_id = ctx.author.id if hasattr(ctx, 'author') else ctx.user.id
@@ -35,7 +35,7 @@ async def analyze_image_command(ctx, image: discord.Attachment):
         formatted_history.append(current_message)
 
         description = await analyze_image(image_url, formatted_history)
-        logger.info("Image analysis completed: %s", description)
+        logger.debug("Image analysis completed: %s", description)
         
         # Insert the user's request and bot's response into the database
         await insert_message(user_id, f"Analyze this image: {image_url}", "image_analysis", 'user')

@@ -15,13 +15,13 @@ MAX_TOKENS = 'max_tokens'
 
 async def update_ai_settings(interaction: discord.Interaction, option: Optional[str] = None, value: Optional[str] = None, model: Optional[str] = None):
     try:
-        logging.info(f"User {interaction.user.id} initiated update_ai_settings with option={option}, value={value}, model={model}")
+        logging.debug(f"User {interaction.user.id} initiated update_ai_settings with option={option}, value={value}, model={model}")
 
         if model is not None:
             if model in MODELS or '/' in model: 
                 await set_ai_preferences(interaction.user.id, ai_model=model)
                 await interaction.response.send_message(f"AI model set to: {model}", ephemeral=True)
-                logging.info(f"AI model set to: {model} for user {interaction.user.id}")
+                logging.debug(f"AI model set to: {model} for user {interaction.user.id}")
             else:
                 await interaction.response.send_message("Error: Invalid model selection.", ephemeral=True)
                 logging.warning(f"Invalid model selection: {model} by user {interaction.user.id}")
@@ -31,13 +31,13 @@ async def update_ai_settings(interaction: discord.Interaction, option: Optional[
             if option in [PERSONALITY, TONE, LANGUAGE, PREBUILD]:
                 await set_personalization(interaction.user.id, option, value)
                 await interaction.response.send_message(f"AI {option} set to: {value}", ephemeral=True)
-                logging.info(f"AI {option} set to: {value} for user {interaction.user.id}")
+                logging.debug(f"AI {option} set to: {value} for user {interaction.user.id}")
             elif option == MAX_TOKENS:
                 try:
                     max_tokens = int(value)
                     await set_ai_preferences(interaction.user.id, max_output=max_tokens)
                     await interaction.response.send_message(f"AI max tokens set to: {max_tokens}", ephemeral=True)
-                    logging.info(f"AI max tokens set to: {max_tokens} for user {interaction.user.id}")
+                    logging.debug(f"AI max tokens set to: {max_tokens} for user {interaction.user.id}")
                 except ValueError:
                     await interaction.response.send_message("Error: max_tokens must be an integer.", ephemeral=True)
                     logging.warning(f"Invalid max_tokens value: {value} by user {interaction.user.id}")

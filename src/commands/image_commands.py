@@ -8,13 +8,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 async def generate_image_command(interaction: discord.Interaction, prompt: str, bot):
-    logger.info(f"Received image generation request with prompt: {prompt}")
+    logger.debug(f"Received image generation request with prompt: {prompt}")
     await interaction.followup.send("Generating image... This may take a few minutes.")
 
     try:
         output = await generate_image(prompt)
         if output:
-            logger.info(f"Image generated successfully for prompt: {prompt}")
+            logger.debug(f"Image generated successfully for prompt: {prompt}")
             await interaction.followup.send(f"Generated image: {output}")
         else:
             logger.warning(f"Image generation failed for prompt: {prompt}")
@@ -37,10 +37,10 @@ async def image_generation_help(interaction: discord.Interaction):
     
     Note: Image generation may take a few minutes. Please be patient.
     """
-    logger.info("Sending image generation help text.")
+    logger.debug("Sending image generation help text.")
     await interaction.followup.send(help_text)
 
 async def analyze_image_command(interaction: discord.Interaction, image: discord.Attachment):
-    logger.info(f"Received image analysis request for image: {image.filename}")
+    logger.debug(f"Received image analysis request for image: {image.filename}")
     from src.commands.image_analysis import analyze_image_command as analyze_image_impl
     await analyze_image_impl(interaction, image)
