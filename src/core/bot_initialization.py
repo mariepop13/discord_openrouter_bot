@@ -4,6 +4,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from src.commands.ai_chat import ai_command
 from src.utils.logging_utils import get_logger
+from src.utils.log_cleanup import cleanup_logs
 
 logger = get_logger(__name__)
 
@@ -18,6 +19,13 @@ def create_bot():
 
 def initialize_bot():
     logger.debug("Initializing bot...")
+    
+    # Clean up log files before initializing the bot
+    log_files_to_keep = int(os.getenv('LOG_FILES_TO_KEEP', 5))
+    logger.info(f"Cleaning up log files, keeping the {log_files_to_keep} most recent files.")
+    cleanup_logs()
+    logger.info("Log cleanup completed.")
+    
     bot = create_bot()
 
     @bot.event
