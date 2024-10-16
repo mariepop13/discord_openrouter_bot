@@ -26,7 +26,7 @@ def register_commands(bot):
     @bot.tree.command(name="ai", description="Chat with the AI")
     @app_commands.describe(message="Your message to the AI")
     async def ai_command_wrapper(interaction: discord.Interaction, message: str):
-        logger.info(f"Received /ai command with message: {message}")
+        logger.debug(f"Received /ai command with message: {message}")
         await ai_command(interaction, message)
 
     @bot.tree.command(name="update_ai_settings", description="Update AI settings")
@@ -45,14 +45,14 @@ def register_commands(bot):
         custom_option: Optional[str] = None
     ):
         option_value = custom_option if option == AIOption.custom else option.value if option else None
-        logger.info(f"Received /update_ai_settings command with model: {model}, option: {option}, value: {value}, custom_option: {custom_option}")
+        logger.debug(f"Received /update_ai_settings command with model: {model}, option: {option}, value: {value}, custom_option: {custom_option}")
         await update_ai_settings(interaction, option_value, value, model)
 
     # Image Commands
     @bot.tree.command(name="analyze", description="Analyze an attached image")
     @app_commands.describe(image="The image to analyze")
     async def analyze(interaction: discord.Interaction, image: discord.Attachment):
-        logger.info(f"Received /analyze command with image: {image.filename}")
+        logger.debug(f"Received /analyze command with image: {image.filename}")
         if not image.content_type.startswith('image/'):
             await interaction.response.send_message("The uploaded file is not an image. Please upload an image file.")
             return
@@ -62,30 +62,30 @@ def register_commands(bot):
     @bot.tree.command(name="generate_image", description="Generate an image based on a prompt")
     @app_commands.describe(prompt="Your image generation prompt")
     async def generate_image(interaction: discord.Interaction, prompt: str):
-        logger.info(f"Received /generate_image command with prompt: {prompt}")
+        logger.debug(f"Received /generate_image command with prompt: {prompt}")
         await interaction.response.defer()
         await generate_image_command(interaction, prompt, bot)
 
     @bot.tree.command(name="image_help", description="Get help with image generation commands")
     async def image_help_command(interaction: discord.Interaction):
-        logger.info("Received /image_help command")
+        logger.debug("Received /image_help command")
         await interaction.response.defer()
         await image_generation_help(interaction)
 
     # Utility Commands
     @bot.tree.command(name="clear", description="Clear the database")
     async def clear_command(interaction: discord.Interaction):
-        logger.info("Received /clear command")
+        logger.debug("Received /clear command")
         await clear(interaction)
 
     @bot.tree.command(name="help", description="Get information about available commands")
     async def help_command_wrapper(interaction: discord.Interaction):
-        logger.info("Received /help command")
+        logger.debug("Received /help command")
         await help_command(interaction)
 
     @bot.tree.command(name="ping", description="Check if the bot is responsive")
     async def ping_command(interaction: discord.Interaction):
-        logger.info("Received /ping command")
+        logger.debug("Received /ping command")
         await ping(interaction)
 
     # Register the history command

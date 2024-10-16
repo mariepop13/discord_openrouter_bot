@@ -14,20 +14,20 @@ async def send_message(interaction: Interaction, content: str, ephemeral: bool =
             await interaction.response.send_message(content=content, embed=embed, ephemeral=ephemeral)
         else:
             await interaction.response.send_message(content, ephemeral=ephemeral)
-        logger.info(f"Message sent: {content}")
+        logger.debug(f"Message sent: {content}")
     except discord.errors.NotFound:
         if embed:
             await interaction.followup.send(content=content, embed=embed, ephemeral=ephemeral)
         else:
             await interaction.followup.send(content, ephemeral=ephemeral)
-        logger.info(f"Follow-up message sent: {content}")
+        logger.debug(f"Follow-up message sent: {content}")
 
 async def ping(interaction: Interaction):
-    logger.info("Ping command received")
+    logger.debug("Ping command received")
     await send_message(interaction, 'Pong!', ephemeral=False)
 
 async def help_command(interaction: Interaction):
-    logger.info("Help command received")
+    logger.debug("Help command received")
     help_embed = discord.Embed(title="Discord OpenRouter Bot", color=discord.Color.blue())
     
     help_embed.description = ("This bot uses OpenRouter.ai API to interact with various AI models, "
@@ -68,15 +68,15 @@ async def help_command(interaction: Interaction):
     )
     
     await send_message(interaction, content="", embed=help_embed, ephemeral=False)
-    logger.info("Help message sent")
+    logger.debug("Help message sent")
 
 async def clear(interaction: Interaction):
-    logger.info("Clear command received")
+    logger.debug("Clear command received")
     try:
         rows_deleted = await clear_user_history()
         response_message = f"All conversation history has been cleared. {rows_deleted} entries have been deleted."
         await send_message(interaction, response_message)
-        logger.info(f"Clear command successful: {rows_deleted} entries deleted")
+        logger.debug(f"Clear command successful: {rows_deleted} entries deleted")
     except Exception as e:
         logging.error(f"Error in clear command: {str(e)}")
         await send_message(interaction, "An error occurred while clearing the conversation history. Please try again later.")
