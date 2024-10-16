@@ -13,8 +13,10 @@ def create_bot():
     load_dotenv()
     intents = discord.Intents.default()
     intents.message_content = True
+    bot_name = os.getenv('BOT_NAME', 'Discord Image Analysis Bot')
     bot = commands.Bot(command_prefix='!', intents=intents)
-    logger.debug("Bot created successfully.")
+    bot.bot_name = bot_name  # Store the bot name as an attribute
+    logger.debug(f"Bot '{bot_name}' created successfully.")
     return bot
 
 def initialize_bot():
@@ -30,7 +32,7 @@ def initialize_bot():
 
     @bot.event
     async def on_ready():
-        logger.info("Bot is ready.")
+        logger.info(f"Bot '{bot.bot_name}' is ready.")
         logger.info(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
         
         client_id = os.getenv('CLIENT_ID')
@@ -58,7 +60,7 @@ def initialize_bot():
                 logger.debug("ai_command executed successfully.")
             except Exception as e:
                 logger.error(f"Error in ai_command: {e}")
-                await message.channel.send("Sorry, I encountered an error while processing your request.")
+                await message.channel.send(f"Sorry, I ({bot.bot_name}) encountered an error while processing your request.")
         
         await bot.process_commands(message)
         logger.debug("Processed commands for the message.")
