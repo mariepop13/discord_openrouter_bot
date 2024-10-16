@@ -1,5 +1,7 @@
 # Discord OpenRouter Bot
 
+Version: 0.1.0-alpha
+
 This Discord bot uses OpenRouter.ai API to interact with various AI models, analyze images, and generate images using Replicate. The bot responds when mentioned and uses a set of commands for multiple functions.
 
 ## Setup
@@ -13,14 +15,17 @@ This Discord bot uses OpenRouter.ai API to interact with various AI models, anal
    ```
    cp .env.template .env
    ```
-4. Open the `.env` file and add the following:
-   ```
-   DISCORD_TOKEN=your_discord_bot_token
-   OPENROUTER_API_KEY=your_openrouter_api_key
-   REPLICATE_API_TOKEN=your_replicate_api_token
-   CLIENT_ID=your_discord_client_id
-   ```
-5. Replace `your_discord_bot_token`, `your_openrouter_api_key`, `your_replicate_api_token`, and `your_discord_client_id` with your actual tokens.
+4. Open the `.env` file and replace the placeholder values with your actual credentials and settings.
+
+   Explanation of each variable in the `.env` file:
+   - `DISCORD_TOKEN`: The authentication token for your Discord bot.
+   - `OPENROUTER_API_KEY`: Your API key to access OpenRouter services.
+   - `REPLICATE_API_TOKEN`: Your API token to use Replicate services (for image generation).
+   - `CLIENT_ID`: The client ID of your Discord application.
+   - `LOG_FILES_TO_KEEP`: The number of log files to keep before rotation.
+   - `BOT_NAME`: The name of your Discord bot.
+   - `ANALYZE_DATA`: JSON configuration for the image analysis model (uses OpenAI GPT-4 by default).
+   - `CHAT_DATA`: JSON configuration for the chat model (uses Google Gemini Flash 1.5 by default).
 
    Note: The `.env` file is crucial for the bot's operation. Make sure to keep it secure and never share it publicly.
 
