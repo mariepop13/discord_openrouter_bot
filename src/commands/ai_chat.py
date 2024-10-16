@@ -42,7 +42,15 @@ def get_personalized_message(personalization: tuple, message: str) -> str:
 def format_chat_history(history):
     formatted_history = []
     for _, content, _, message_type, _ in history:
-        role = "user" if message_type == "user" else "assistant"
+        if message_type == "user":
+            role = "user"
+        elif message_type == "bot":
+            role = "assistant"
+        elif message_type == "image_analysis":
+            role = "system"
+            content = f"Image analysis: {content}"
+        else:
+            role = "system"
         formatted_history.append({"role": role, "content": content})
     logging.debug(f"Formatted chat history: {formatted_history}")
     return formatted_history
