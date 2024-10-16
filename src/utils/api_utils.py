@@ -13,7 +13,7 @@ async def chat_with_ai(messages, max_tokens):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "openai/chatgpt-4o-latest",
+        "model": "google/gemini-flash-1.5",
         "messages": messages,
         "max_tokens": max_tokens
     }
