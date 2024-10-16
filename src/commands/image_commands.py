@@ -2,6 +2,7 @@ import discord
 import asyncio
 import logging
 from src.utils.api_utils import generate_image
+from src.commands.image_analysis import analyze_image_command as analyze_image_impl
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -42,5 +43,4 @@ async def image_generation_help(interaction: discord.Interaction):
 
 async def analyze_image_command(interaction: discord.Interaction, image: discord.Attachment):
     logger.debug(f"Received image analysis request for image: {image.filename}")
-    from src.commands.image_analysis import analyze_image_command as analyze_image_impl
     await analyze_image_impl(interaction, image)

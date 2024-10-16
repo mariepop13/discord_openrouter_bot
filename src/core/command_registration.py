@@ -90,3 +90,5 @@ def register_commands(bot):
 
     # Register the history command
     bot.tree.add_command(history)
+
+    logger.info("All commands registered successfully.")
