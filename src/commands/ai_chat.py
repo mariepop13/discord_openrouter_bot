@@ -7,21 +7,24 @@ from collections import defaultdict
 import time
 from typing import Union, Optional
 
-# These could be moved to a config file
 CLIENT_ID = int(os.getenv('CLIENT_ID', '0'))
-COOLDOWN_TIME = 5  # Cooldown time in seconds
-HISTORY_LIMIT = 20  # Number of previous messages to include for context
+COOLDOWN_TIME = 5
+HISTORY_LIMIT = 20 
 
 last_response_time = defaultdict(float)
 
 def is_on_cooldown(user_id: int) -> bool:
-    return time.time() - last_response_time[user_id] < COOLDOWN_TIME
+    on_cooldown = time.time() - last_response_time[user_id] < COOLDOWN_TIME
+    logging.debug(f"User {user_id} is {'on' if on_cooldown else 'not on'} cooldown.")
+    return on_cooldown
 
 def update_cooldown(user_id: int) -> None:
     last_response_time[user_id] = time.time()
+    logging.debug(f"Updated cooldown for user {user_id}.")
 
 def get_personalized_message(personalization: tuple, message: str) -> str:
     if not personalization:
+        logging.debug("No personalization found.")
         return message
 
     pers, tn, lang, _, _ = personalization
@@ -31,7 +34,9 @@ def get_personalized_message(personalization: tuple, message: str) -> str:
     parts = [p for p in parts if p]
     
     if parts:
-        return f"Please respond with {', '.join(parts)}. User message: {message}"
+        personalized_message = f"Please respond with {', '.join(parts)}. User message: {message}"
+        logging.debug(f"Personalized message: {personalized_message}")
+        return personalized_message
     return message
 
 def format_chat_history(history):
@@ -39,15 +44,17 @@ def format_chat_history(history):
     for _, content, _, message_type, _ in history:
         role = "user" if message_type == "user" else "assistant"
         formatted_history.append({"role": role, "content": content})
+    logging.debug(f"Formatted chat history: {formatted_history}")
     return formatted_history
 
 async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: str, model: Optional[str] = None, max_tokens: Optional[int] = None):
     user_id = ctx.author.id if hasattr(ctx, 'author') else ctx.user.id
 
     if is_on_cooldown(user_id):
+        logging.debug(f"User {user_id} is on cooldown. Command ignored.")
         return
 
-    logging.info(f"AI command called for user {user_id}")
+    logging.debug(f"AI command called for user {user_id}")
     
     is_interaction = isinstance(ctx, discord.Interaction)
     if is_interaction:
@@ -57,6 +64,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         ai_prefs = await get_ai_preferences(user_id)
         model = model or ai_prefs[0]
         max_tokens = max_tokens or ai_prefs[1]
+        logging.debug(f"AI preferences for user {user_id}: model={model}, max_tokens={max_tokens}")
 
         personalization = await get_personalization(user_id)
         personalized_message = get_personalized_message(personalization, message)
@@ -69,6 +77,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         formatted_history.append({"role": "user", "content": personalized_message})
 
         bot_response = await chat_with_ai(formatted_history, max_tokens)
+        logging.debug(f"Bot response: {bot_response}")
 
         await insert_message(user_id, message, model, 'user')
         await insert_message(CLIENT_ID, bot_response, model, 'bot')
@@ -89,5 +98,6 @@ async def send_message(ctx: Union[discord.Interaction, discord.Message], message
                 await ctx.response.send_message(message)
         else:
             await ctx.channel.send(message)
+        logging.debug(f"Sent message: {message}")
     except Exception as e:
         logging.error(f"Failed to send message: {str(e)}", exc_info=True)
