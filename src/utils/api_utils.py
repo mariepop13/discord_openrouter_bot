@@ -8,7 +8,7 @@ OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 async def chat_with_ai(messages, max_tokens):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://github.com/yourusername/your-repo",  # Replace with your GitHub repo or actual domain
+        "HTTP-Referer": "https://github.com/mariepop13/discord_openrouter_bot",  # Replace with your GitHub repo or actual domain
         "X-Title": os.getenv('BOT_NAME'),
         "Content-Type": "application/json"
     }
@@ -36,7 +36,7 @@ async def generate_image(prompt):
 async def analyze_image(image_url, chat_history=None):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://github.com/yourusername/your-repo",  # Replace with your GitHub repo or actual domain
+        "HTTP-Referer": "https://github.com/mariepop13/discord_openrouter_bot",  # Replace with your GitHub repo or actual domain
         "X-Title": os.getenv('BOT_NAME'),
         "Content-Type": "application/json"
     }
