@@ -33,24 +33,26 @@ async def generate_image(prompt):
     )
     return output
 
-async def analyze_image(image_url):
+async def analyze_image(image_url, chat_history=None):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "HTTP-Referer": "https://github.com/yourusername/your-repo",  # Replace with your GitHub repo or actual domain
         "X-Title": "Discord Image Analysis Bot",  # Replace with your actual bot name
         "Content-Type": "application/json"
     }
+
+    messages = chat_history or []
+    messages.append({
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Analyze this image and provide a detailed description of what you see. If there's any relevant context from our previous conversation, please take that into account in your analysis. Reponds dans la langue préceédente (respond in the previous language)."},
+            {"type": "image_url", "image_url": {"url": image_url}}
+        ]
+    })
+
     data = {
         "model": "openai/chatgpt-4o-latest",
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "Analyze this image and provide a detailed description of what you see."},
-                    {"type": "image_url", "image_url": {"url": image_url}}
-                ]
-            }
-        ],
+        "messages": messages,
         "max_tokens": 300
     }
 
