@@ -1,6 +1,7 @@
 import discord
 from src.utils.api_utils import chat_with_ai
-from src.database.database_operations import get_personalization, get_ai_preferences, insert_message, get_history
+from src.database.database_operations import get_personalization, get_ai_preferences
+from src.database.message_operations import insert_message, get_messages_for_channel
 import logging
 import os
 from collections import defaultdict
@@ -9,7 +10,7 @@ from typing import Union, Optional
 
 CLIENT_ID = int(os.getenv('CLIENT_ID', '0'))
 COOLDOWN_TIME = 5
-HISTORY_LIMIT = 20 
+HISTORY_LIMIT = int(os.getenv('HISTORY_LIMIT'))
 
 last_response_time = defaultdict(float)
 
@@ -41,7 +42,7 @@ def get_personalized_message(personalization: tuple, message: str) -> str:
 
 def format_chat_history(history):
     formatted_history = []
-    for _, content, _, message_type, _ in history:
+    for user_id, content, model, message_type, timestamp in history:
         if message_type == "user":
             role = "user"
         elif message_type == "bot":
@@ -57,12 +58,13 @@ def format_chat_history(history):
 
 async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: str, model: Optional[str] = None, max_tokens: Optional[int] = None):
     user_id = ctx.author.id if hasattr(ctx, 'author') else ctx.user.id
+    channel_id = ctx.channel.id
 
     if is_on_cooldown(user_id):
         logging.debug(f"User {user_id} is on cooldown. Command ignored.")
         return
 
-    logging.debug(f"AI command called for user {user_id}")
+    logging.debug(f"AI command called for user {user_id} in channel {channel_id}")
     
     is_interaction = isinstance(ctx, discord.Interaction)
     if is_interaction:
@@ -77,8 +79,8 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         personalization = await get_personalization(user_id)
         personalized_message = get_personalized_message(personalization, message)
 
-        # Retrieve chat history
-        chat_history = await get_history(user_id, HISTORY_LIMIT)
+        # Retrieve chat history for the specific channel
+        chat_history = await get_messages_for_channel(channel_id, HISTORY_LIMIT)
         formatted_history = format_chat_history(chat_history)
 
         # Add the current message to the history
@@ -87,8 +89,8 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         bot_response = await chat_with_ai(formatted_history, max_tokens)
         logging.debug(f"Bot response: {bot_response}")
 
-        await insert_message(user_id, message, model, 'user')
-        await insert_message(CLIENT_ID, bot_response, model, 'bot')
+        await insert_message(user_id, channel_id, message, model, 'user')
+        await insert_message(CLIENT_ID, channel_id, bot_response, model, 'bot')
 
         await send_message(ctx, bot_response)
         update_cooldown(user_id)

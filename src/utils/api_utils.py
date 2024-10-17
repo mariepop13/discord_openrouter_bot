@@ -14,19 +14,15 @@ OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Définition des valeurs par défaut
-DEFAULT_CHAT_DATA = {"model": "google/gemini-flash-1.5"}
-DEFAULT_ANALYZE_DATA = {"model": "openai/chatgpt-4o-latest"}
+DEFAULT_CHAT_DATA = "google/gemini-flash-1.5"
+DEFAULT_ANALYZE_DATA = "openai/chatgpt-4o-latest"
 
-# Chargement des variables d'environnement avec gestion des erreurs
-def load_env_json(env_var, default):
-    try:
-        return json.loads(os.getenv(env_var, 'null')) or default
-    except json.JSONDecodeError:
-        logger.error(f"JSON decoding error for {env_var}. Using default value.")
-        return default
+# Chargement des variables d'environnement
+def load_env_value(env_var, default):
+    return os.getenv(env_var, default)
 
-CHAT_DATA = load_env_json('CHAT_DATA', DEFAULT_CHAT_DATA)
-ANALYZE_DATA = load_env_json('ANALYZE_DATA', DEFAULT_ANALYZE_DATA)
+CHAT_DATA = load_env_value('CHAT_DATA', DEFAULT_CHAT_DATA)
+ANALYZE_DATA = load_env_value('ANALYZE_DATA', DEFAULT_ANALYZE_DATA)
 
 async def chat_with_ai(messages, max_tokens=None):
     headers = {
@@ -35,8 +31,10 @@ async def chat_with_ai(messages, max_tokens=None):
         "X-Title": os.getenv('BOT_NAME'),
         "Content-Type": "application/json"
     }
-    chat_data = CHAT_DATA.copy()
-    chat_data["messages"] = messages
+    chat_data = {
+        "model": CHAT_DATA,
+        "messages": messages
+    }
     if max_tokens:
         chat_data["max_tokens"] = max_tokens
 
@@ -107,8 +105,10 @@ async def analyze_image(image_url, chat_history=None):
         ]
     })
 
-    analyze_data = ANALYZE_DATA.copy()
-    analyze_data["messages"] = messages
+    analyze_data = {
+        "model": ANALYZE_DATA,
+        "messages": messages
+    }
 
     try:
         async with aiohttp.ClientSession() as session:

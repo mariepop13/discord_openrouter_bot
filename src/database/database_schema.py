@@ -10,6 +10,7 @@ async def create_tables():
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
+            channel_id INTEGER,
             content TEXT,
             model TEXT,
             message_type TEXT,
@@ -44,7 +45,7 @@ async def run_migrations():
     logging.debug("Running migrations.")
     migrations = {
         'personalization': ['ai_model', 'max_output'],
-        'messages': ['message_type']
+        'messages': ['message_type', 'channel_id']
     }
     
     for table, new_columns in migrations.items():
@@ -52,7 +53,8 @@ async def run_migrations():
         for column in new_columns:
             if column not in existing_columns:
                 logging.debug(f"Adding {column} column to {table} table")
-                await execute_query(f"ALTER TABLE {table} ADD COLUMN {column} TEXT")
+                column_type = 'INTEGER' if column == 'channel_id' else 'TEXT'
+                await execute_query(f"ALTER TABLE {table} ADD COLUMN {column} {column_type}")
     logging.debug("Migrations completed.")
 
 async def get_existing_columns(table: str) -> List[str]:
