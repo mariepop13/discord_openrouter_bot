@@ -34,23 +34,6 @@ async def generate_image_command(interaction: discord.Interaction, prompt: str, 
         logger.error(f"Error occurred while generating image for prompt: {prompt}, Error: {str(e)}")
         await interaction.followup.send(f"Sorry, an error occurred while generating the image. Please try again later.")
 
-async def image_generation_help(interaction: discord.Interaction):
-    help_text = """
-    Image Generation Command Help:
-    
-    Usage: /generate_image <prompt>
-    
-    Options:
-    - prompt: Your description of the image you want to generate.
-    
-    Example:
-    /generate_image A beautiful sunset over the ocean
-    
-    Note: Image generation may take a few minutes. Please be patient.
-    """
-    logger.debug("Sending image generation help text.")
-    await interaction.followup.send(help_text)
-
 async def analyze_image_command(interaction: discord.Interaction, image: discord.Attachment):
     logger.debug(f"Received image analysis request for image: {image.filename}")
     await analyze_image_impl(interaction, image)

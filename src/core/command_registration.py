@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from src.commands.ai_preferences import update_ai_settings
-from src.commands.image_commands import analyze_image_command, generate_image_command, image_generation_help
+from src.commands.image_commands import analyze_image_command, generate_image_command
 from src.commands.general_commands import clear, ping, help_command
 from src.commands.history_command import history
 from src.commands.ai_chat import ai_command
@@ -65,12 +65,6 @@ def register_commands(bot):
         logger.debug(f"Received /generate_image command with prompt: {prompt}")
         await interaction.response.defer()
         await generate_image_command(interaction, prompt, bot)
-
-    @bot.tree.command(name="image_help", description="Get help with image generation commands")
-    async def image_help_command(interaction: discord.Interaction):
-        logger.debug("Received /image_help command")
-        await interaction.response.defer()
-        await image_generation_help(interaction)
 
     # Utility Commands
     @bot.tree.command(name="clear", description="Clear the database")
