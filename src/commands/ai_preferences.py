@@ -2,7 +2,7 @@ from typing import Optional
 import discord
 import logging
 from src.database.database_operations import set_personalization, set_ai_preferences
-from src.utils.models import MODELS
+from src.utils.models import CHAT_MODELS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -18,7 +18,7 @@ async def update_ai_settings(interaction: discord.Interaction, option: Optional[
         logging.debug(f"User {interaction.user.id} initiated update_ai_settings with option={option}, value={value}, model={model}")
 
         if model is not None:
-            if model in MODELS or '/' in model: 
+            if model in CHAT_MODELS or '/' in model: 
                 await set_ai_preferences(interaction.user.id, ai_model=model)
                 await interaction.response.send_message(f"AI model set to: {model}", ephemeral=True)
                 logging.debug(f"AI model set to: {model} for user {interaction.user.id}")
