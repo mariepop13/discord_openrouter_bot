@@ -35,6 +35,10 @@ def initialize_bot():
         logger.info(f"Bot '{bot.bot_name}' is ready.")
         logger.info(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
         
+        # Set the bot's status to online with a custom activity
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Ready to chat!"))
+        logger.info("Bot status set to online with 'Ready to chat!' activity.")
+        
         client_id = os.getenv('CLIENT_ID')
         if client_id:
             permissions = discord.Permissions.text()
