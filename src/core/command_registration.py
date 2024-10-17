@@ -88,6 +88,12 @@ def register_commands(bot):
         logger.debug("Received /ping command")
         await ping(interaction)
 
+    @bot.tree.command(name="models", description="List available AI models")
+    async def list_models(interaction: discord.Interaction):
+        model_list = "\n".join([f"- {model.split('/')[-1]}" for model in MODELS])
+        await interaction.response.send_message(f"Available models:\n{model_list}")
+        logger.debug("Listed available models.")
+
     # Register the history command
     bot.tree.add_command(history)
 

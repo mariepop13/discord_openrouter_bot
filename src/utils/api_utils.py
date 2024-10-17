@@ -2,6 +2,8 @@ import os
 import json
 import aiohttp
 import replicate
+import uuid
+from pathlib import Path
 
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -42,11 +44,27 @@ async def chat_with_ai(messages, max_tokens=None):
                 return f"Sorry, I couldn't process your request. Status code: {response.status}"
 
 async def generate_image(prompt):
-    output = replicate.run(
-        "black-forest-labs/flux-1.1-pro",
+    [output] = replicate.run(
+        "black-forest-labs/flux-dev",
         input={"prompt": prompt, "prompt_upsampling": True}
     )
-    return output
+    
+    # Generate a unique filename
+    filename = f"{uuid.uuid4()}.webp"
+    filepath = Path("generated_images") / filename
+    
+    # Ensure the directory exists
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Save the image locally
+    with open(filepath, 'wb') as file:
+        file.write(output.read())
+    
+    # Return the local file path and the URL
+    return {
+        "local_path": str(filepath),
+        "url": output.url
+    }
 
 async def analyze_image(image_url, chat_history=None):
     headers = {

@@ -43,11 +43,7 @@ def initialize_bot():
         else:
             logger.warning("CLIENT_ID not found in .env file. Invite link couldn't be generated.")
 
-        try:
-            synced = await bot.tree.sync()
-            logger.info(f'Synced {len(synced)} commands globally.')
-        except Exception as e:
-            logger.error(f'Error syncing commands: {e}')
+        await force_sync(bot)
 
     @bot.event
     async def on_message(message):
@@ -65,4 +61,28 @@ def initialize_bot():
         await bot.process_commands(message)
         logger.debug("Processed commands for the message.")
 
+    # Add the forcesync command to the bot
+    @commands.is_owner()
+    @commands.command(name='forcesync', hidden=True)
+    async def forcesync(ctx):
+        logger.info(f"Force sync requested by {ctx.author}")
+        synced = await force_sync(ctx.bot)
+        if synced:
+            await ctx.send(f'Synced {len(synced)} commands globally.')
+        else:
+            await ctx.send('Failed to sync commands. Check logs for details.')
+
+    bot.add_command(forcesync)
+    logger.info("Added forcesync command to the bot.")
+
     return bot
+
+async def force_sync(bot):
+    logger.info("Forcing a re-sync of all commands...")
+    try:
+        synced = await bot.tree.sync()
+        logger.info(f'Synced {len(synced)} commands globally.')
+        return synced
+    except Exception as e:
+        logger.error(f'Error syncing commands: {e}')
+        return None

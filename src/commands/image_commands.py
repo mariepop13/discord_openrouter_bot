@@ -14,15 +14,25 @@ async def generate_image_command(interaction: discord.Interaction, prompt: str, 
 
     try:
         output = await generate_image(prompt)
-        if output:
+        if output and 'local_path' in output and 'url' in output:
             logger.debug(f"Image generated successfully for prompt: {prompt}")
-            await interaction.followup.send(f"Generated image: {output}")
+            
+            # Prepare the message content
+            message = "Generated image:"
+
+            # Send the image as a file attachment with the message
+            file = discord.File(output['local_path'], filename='generated_image.webp')
+            try:
+                await interaction.followup.send(content=message, file=file)
+            except discord.HTTPException as e:
+                logger.error(f"Failed to send message: {str(e)}")
+                await interaction.followup.send("The image was generated, but I couldn't send it due to a Discord error. Please try again.")
         else:
             logger.warning(f"Image generation failed for prompt: {prompt}")
             await interaction.followup.send("Sorry, I couldn't generate the image. Please try again with a different prompt.")
     except Exception as e:
         logger.error(f"Error occurred while generating image for prompt: {prompt}, Error: {str(e)}")
-        await interaction.followup.send(f"Sorry, an error occurred while generating the image: {str(e)}")
+        await interaction.followup.send(f"Sorry, an error occurred while generating the image. Please try again later.")
 
 async def image_generation_help(interaction: discord.Interaction):
     help_text = """
