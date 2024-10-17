@@ -52,8 +52,26 @@ async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only
         logging.error(f"Error getting history for user_id={user_id}: {str(e)}")
         return [] if not count_only else 0
 
+async def clear_channel_history(channel_id: int) -> int:
+    logging.debug(f"Clearing history for channel_id={channel_id}")
+    try:
+        # Count messages before deleting
+        count_query = 'SELECT COUNT(*) FROM messages WHERE channel_id = ?'
+        count_result = await execute_query(count_query, (channel_id,), fetchone=True)
+        message_count = count_result[0] if count_result else 0
+
+        # Delete messages
+        delete_query = 'DELETE FROM messages WHERE channel_id = ?'
+        await execute_query(delete_query, (channel_id,))
+
+        logging.debug(f"Cleared {message_count} messages from channel_id={channel_id}")
+        return message_count
+    except Exception as e:
+        logging.error(f"Error clearing channel history for channel_id={channel_id}: {str(e)}")
+        raise
+
 async def clear_user_history() -> int:
-    logging.debug("Clearing user history")
+    logging.debug("Clearing all user history")
     try:
         messages_count = await execute_query('SELECT COUNT(*) FROM messages', fetchone=True)
         comments_count = await execute_query('SELECT COUNT(*) FROM comments', fetchone=True)

@@ -1,8 +1,17 @@
 import discord
 import logging
+from discord import app_commands
+from typing import List
 from src.database.message_operations import get_messages_for_channel
 from src.utils.message_formatting import format_message
 from src.config import MAX_EMBED_LENGTH, MESSAGES_PER_PAGE
+
+async def get_channel_choices(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    choices = []
+    for channel in interaction.guild.text_channels:
+        if current.lower() in channel.name.lower():
+            choices.append(app_commands.Choice(name=channel.name, value=str(channel.id)))
+    return choices[:25]  # Discord has a limit of 25 choices
 
 async def show_history_page(interaction: discord.Interaction, channel_id: int, page: int = 1, filter_type: str = 'all'):
     try:
