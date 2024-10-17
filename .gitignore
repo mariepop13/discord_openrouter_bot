@@ -49,3 +49,6 @@ Thumbs.db
 
 # Generated images
 generated_images/
+
+# Load tmux environment
+load_env_tmux.sh
