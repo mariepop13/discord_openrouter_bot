@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from src.commands.ai_chat import ai_command
 from src.utils.logging_utils import get_logger
 from src.utils.log_cleanup import cleanup_logs
+from src.database.database_schema import setup_database  # Add this import
+import asyncio  # Add this import
 
 logger = get_logger(__name__)
 
@@ -34,6 +36,11 @@ def initialize_bot():
     async def on_ready():
         logger.info(f"Bot '{bot.bot_name}' is ready.")
         logger.info(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
+        
+        # Set up the database
+        logger.info("Setting up the database...")
+        await setup_database()
+        logger.info("Database setup completed.")
         
         # Set the bot's status to online with a custom activity
         await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Ready to chat!"))
