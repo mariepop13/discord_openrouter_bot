@@ -6,7 +6,7 @@ from src.commands.general_commands import clear, ping, help_command
 from src.commands.history_command import history
 from src.commands.ai_chat import ai_command
 from typing import Optional
-from src.utils.models import MODELS
+from src.utils.models import CHAT_MODELS, GENERATE_IMAGE_MODELS
 import logging
 
 # Configure logging
@@ -36,7 +36,7 @@ def register_commands(bot):
         model="The AI model to use",
         custom_option="If 'custom' is selected, specify the custom option here"
     )
-    @app_commands.choices(model=[app_commands.Choice(name=model, value=model) for model in MODELS])
+    @app_commands.choices(model=[app_commands.Choice(name=model, value=model) for model in CHAT_MODELS])
     async def update_ai_settings_wrapper(
         interaction: discord.Interaction, 
         model: Optional[str] = None,
@@ -60,11 +60,15 @@ def register_commands(bot):
         await analyze_image_command(interaction, image)
 
     @bot.tree.command(name="generate_image", description="Generate an image based on a prompt")
-    @app_commands.describe(prompt="Your image generation prompt")
-    async def generate_image(interaction: discord.Interaction, prompt: str):
-        logger.debug(f"Received /generate_image command with prompt: {prompt}")
+    @app_commands.describe(
+        prompt="Your image generation prompt",
+        model="The image generation model to use"
+    )
+    @app_commands.choices(model=[app_commands.Choice(name=model, value=model) for model in GENERATE_IMAGE_MODELS])
+    async def generate_image(interaction: discord.Interaction, prompt: str, model: str = "black-forest-labs/flux-dev"):
+        logger.debug(f"Received /generate_image command with prompt: {prompt}, model: {model}")
         await interaction.response.defer()
-        await generate_image_command(interaction, prompt, bot)
+        await generate_image_command(interaction, prompt, model, bot)
 
     # Utility Commands
     @bot.tree.command(name="clear", description="Clear the database")
@@ -84,7 +88,7 @@ def register_commands(bot):
 
     @bot.tree.command(name="models", description="List available AI models")
     async def list_models(interaction: discord.Interaction):
-        model_list = "\n".join([f"- {model.split('/')[-1]}" for model in MODELS])
+        model_list = "\n".join([f"- {model.split('/')[-1]}" for model in CHAT_MODELS])
         await interaction.response.send_message(f"Available models:\n{model_list}")
         logger.debug("Listed available models.")
 
