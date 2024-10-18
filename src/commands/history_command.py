@@ -11,19 +11,23 @@ def register_history_command(bot):
     @app_commands.describe(
         channel="The channel to view history for (optional)",
         page="The page number to view (default: 1)",
-        filter_type="Filter type: 'all', 'chat', or 'image' (default: all)"
+        filter_type="Filter type: 'all', 'chat', or 'image' (default: all)",
+        user="The user to view history for (admin only, optional)"
     )
     async def history_command(
         interaction: discord.Interaction,
         channel: Optional[str] = None,
         page: int = 1,
-        filter_type: Literal["all", "chat", "image"] = "all"
+        filter_type: Literal["all", "chat", "image"] = "all",
+        user: Optional[discord.User] = None
     ):
-        logger.debug(f"Received /history command with channel: {channel}, page: {page}, filter_type: {filter_type}")
+        logger.debug(f"Received /history command with channel: {channel}, page: {page}, filter_type: {filter_type}, user: {user}")
         
         if not interaction.user.guild_permissions.administrator:
-            await interaction.response.send_message("You don't have permission to view history.", ephemeral=True)
-            return
+            if user:
+                await interaction.response.send_message("You don't have permission to view other users' history.", ephemeral=True)
+                return
+            user = interaction.user
 
         try:
             if channel:
@@ -35,7 +39,7 @@ def register_history_command(bot):
             else:
                 channel_id = interaction.channel.id
 
-            await show_history_page(interaction, channel_id, page, filter_type, ephemeral=True)
+            await show_history_page(interaction, channel_id, page, filter_type, user=user, ephemeral=True)
         except Exception as e:
             logger.error(f"Error in history command: {str(e)}")
             await interaction.response.send_message(f"An error occurred while retrieving history: {str(e)}", ephemeral=True)

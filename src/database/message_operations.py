@@ -12,22 +12,40 @@ async def insert_message(user_id: int, channel_id: int, content: str, model: str
         logging.error(f"Error inserting message: {str(e)}")
         raise
 
-async def get_messages_for_channel(channel_id: int, limit: int = 50) -> List[Tuple]:
-    logging.debug(f"Attempting to retrieve messages for channel_id={channel_id}, limit={limit}")
+async def get_messages_for_channel(channel_id: int, limit: int = 50, offset: int = 0) -> List[Tuple]:
+    logging.debug(f"Attempting to retrieve messages for channel_id={channel_id}, limit={limit}, offset={offset}")
     try:
         result = await execute_query('''
             SELECT user_id, content, model, message_type, timestamp 
             FROM messages 
             WHERE channel_id = ? 
             ORDER BY 
-                timestamp ASC,
+                timestamp DESC,
                 CASE WHEN message_type = 'bot' THEN 1 ELSE 0 END
-            LIMIT ?
-        ''', (channel_id, limit))
+            LIMIT ? OFFSET ?
+        ''', (channel_id, limit, offset))
         logging.debug(f"Retrieved {len(result)} messages for channel {channel_id}")
         return result
     except Exception as e:
         logging.error(f"Error retrieving messages for channel {channel_id}: {str(e)}")
+        raise
+
+async def get_messages_for_user(user_id: int, channel_id: int, limit: int = 50, offset: int = 0) -> List[Tuple]:
+    logging.debug(f"Attempting to retrieve messages for user_id={user_id}, channel_id={channel_id}, limit={limit}, offset={offset}")
+    try:
+        result = await execute_query('''
+            SELECT user_id, content, model, message_type, timestamp 
+            FROM messages 
+            WHERE user_id = ? AND channel_id = ? 
+            ORDER BY 
+                timestamp DESC,
+                CASE WHEN message_type = 'bot' THEN 1 ELSE 0 END
+            LIMIT ? OFFSET ?
+        ''', (user_id, channel_id, limit, offset))
+        logging.debug(f"Retrieved {len(result)} messages for user {user_id} in channel {channel_id}")
+        return result
+    except Exception as e:
+        logging.error(f"Error retrieving messages for user {user_id} in channel {channel_id}: {str(e)}")
         raise
 
 async def get_last_message_for_channel(channel_id: int) -> Tuple:

@@ -49,6 +49,11 @@ The bot responds when it is mentioned (@bot_name) in a message or when specific 
 - `/help`: Show the help message with all available commands
 - `/ping`: Check if the bot is responsive
 - `/clear`: Clear all conversation history
+- `/history [channel] [page] [filter_type] [user]`: View chat history (admin-only for user parameter)
+  - `channel`: Optional. The channel to view history for.
+  - `page`: Optional. The page number to view (default: 1).
+  - `filter_type`: Optional. Filter type: 'all', 'chat', or 'image' (default: all).
+  - `user`: Optional, admin-only. The user to view history for.
 
 ### AI Commands
 - `/ai [message]`: Chat with the AI
@@ -68,6 +73,12 @@ The bot responds when it is mentioned (@bot_name) in a message or when specific 
   - Set only the model: `/update_ai_settings model:gpt-openai/gpt-4o`
   - Set an option and value: `/update_ai_settings option:tone value:professional`
   - Set both model and an option: `/update_ai_settings model:openai/gpt-4o option:max_tokens value:2000`
+- View chat history:
+  - View history for current channel: `/history`
+  - View history for a specific channel: `/history channel:#general`
+  - View history with pagination: `/history page:2`
+  - View history with filter: `/history filter_type:chat`
+  - Admin view history for a specific user: `/history user:@username`
 
 ## Contributing
 
