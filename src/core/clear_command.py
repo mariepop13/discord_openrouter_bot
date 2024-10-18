@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
-from src.database.history_operations import clear_channel_history, clear_user_history
+from src.database.history_clearing import clear_channel_history
+from src.database.history_clearing import clear_user_history
 from src.utils.history_utils import get_channel_choices
 from typing import Optional, Literal, List
 import logging

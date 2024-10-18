@@ -1,7 +1,7 @@
 import discord
 import asyncio
 import logging
-from src.utils.api_utils import generate_image
+from src.utils.image_generation import generate_image
 from src.commands.image_analysis import analyze_image_command as analyze_image_impl
 from src.utils.models import GENERATE_IMAGE_MODELS
 

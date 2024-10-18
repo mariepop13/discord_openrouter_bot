@@ -1,5 +1,5 @@
 import discord
-from src.utils.api_utils import analyze_image
+from src.utils.image_analysis import analyze_image
 from src.database.database_operations import get_history, insert_message
 import logging
 import os
