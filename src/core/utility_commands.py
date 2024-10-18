@@ -1,6 +1,5 @@
 import discord
 from src.commands.general_commands import ping, help_command
-from src.commands.history_command import history
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,6 +14,3 @@ def register_utility_commands(bot):
     async def ping_command(interaction: discord.Interaction):
         logger.debug("Received /ping command")
         await ping(interaction)
-
-    # Register the history command
-    bot.tree.add_command(history)

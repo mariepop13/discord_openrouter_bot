@@ -2,9 +2,11 @@ import os
 import asyncio
 from dotenv import load_dotenv
 from discord import errors
+from discord.ext import commands
 from src.core.bot_initialization import initialize_bot
 from src.core.command_registration import register_commands
 from src.utils.logging_utils import get_logger
+from src.commands.history_command import HistoryCommand
 
 # Configure logging
 logger = get_logger(__name__)
@@ -14,13 +16,18 @@ load_dotenv()
 logger.debug("Environment variables loaded.")
 
 def setup_bot():
-    # Initialize the bot
+    # Initialize the bot with command prefix
     bot = initialize_bot()
+    bot.command_prefix = '!'
     logger.debug("Bot initialized.")
 
     # Register commands
     register_commands(bot)
     logger.debug("Commands registered.")
+
+    # Load the HistoryCommand cog
+    asyncio.run(bot.add_cog(HistoryCommand(bot)))
+    logger.debug("HistoryCommand cog loaded.")
 
     @bot.event
     async def on_error(event, *args, **kwargs):
