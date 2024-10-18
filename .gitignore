@@ -50,5 +50,5 @@ Thumbs.db
 # Generated images
 generated_images/
 
-# Load tmux environment
+# Dev tools
 dev_tools/
