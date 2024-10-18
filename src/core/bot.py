@@ -6,7 +6,7 @@ from discord.ext import commands
 from src.core.bot_initialization import initialize_bot
 from src.core.command_registration import register_commands
 from src.utils.logging_utils import get_logger
-from src.commands.history_command import HistoryCommand
+from src.commands.history_command import register_history_command
 
 # Configure logging
 logger = get_logger(__name__)
@@ -25,9 +25,9 @@ def setup_bot():
     register_commands(bot)
     logger.debug("Commands registered.")
 
-    # Load the HistoryCommand cog
-    asyncio.run(bot.add_cog(HistoryCommand(bot)))
-    logger.debug("HistoryCommand cog loaded.")
+    # Register the history command
+    register_history_command(bot)
+    logger.debug("History command registered.")
 
     @bot.event
     async def on_error(event, *args, **kwargs):
