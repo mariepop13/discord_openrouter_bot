@@ -18,14 +18,16 @@ This Discord bot uses OpenRouter.ai API to interact with various AI models, anal
 4. Open the `.env` file and replace the placeholder values with your actual credentials and settings.
 
    Explanation of each variable in the `.env` file:
+
    - `DISCORD_TOKEN`: The authentication token for your Discord bot.
    - `OPENROUTER_API_KEY`: Your API key to access OpenRouter services.
    - `REPLICATE_API_TOKEN`: Your API token to use Replicate services (for image generation).
    - `CLIENT_ID`: The client ID of your Discord application.
    - `LOG_FILES_TO_KEEP`: The number of log files to keep before rotation.
    - `BOT_NAME`: The name of your Discord bot.
-   - `ANALYZE_DATA`: JSON configuration for the image analysis model (uses OpenAI GPT-4 by default).
-   - `CHAT_DATA`: JSON configuration for the chat model (uses Google Gemini Flash 1.5 by default).
+   - `ANALYZE_DATA`: Configuration for the image analysis model (defaults to OpenAI chatgpt-4o).
+   - `CHAT_DATA`: Configuration for the chat model (defaults to Google Gemini Flash 1.5).
+   - `HISTORY_LIMIT`: The maximum number of messages to keep in the conversation history.
 
    Note: The `.env` file is crucial for the bot's operation. Make sure to keep it secure and never share it publicly.
 
