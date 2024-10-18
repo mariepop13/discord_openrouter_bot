@@ -58,7 +58,8 @@ def filter_history(chat_history, filter_type):
     ]
 
 def format_history(filtered_history):
-    return "\n\n".join([format_message(*message) for message in filtered_history])
+    # Reverse the order of messages before formatting
+    return "\n\n".join([format_message(*message) for message in reversed(filtered_history)])
 
 def create_chunks(formatted_history):
     return [formatted_history[i:i+MAX_EMBED_LENGTH] for i in range(0, len(formatted_history), MAX_EMBED_LENGTH)]

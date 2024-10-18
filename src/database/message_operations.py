@@ -19,7 +19,9 @@ async def get_messages_for_channel(channel_id: int, limit: int = 50) -> List[Tup
             SELECT user_id, content, model, message_type, timestamp 
             FROM messages 
             WHERE channel_id = ? 
-            ORDER BY timestamp DESC 
+            ORDER BY 
+                timestamp ASC,
+                CASE WHEN message_type = 'bot' THEN 1 ELSE 0 END
             LIMIT ?
         ''', (channel_id, limit))
         logging.debug(f"Retrieved {len(result)} messages for channel {channel_id}")
