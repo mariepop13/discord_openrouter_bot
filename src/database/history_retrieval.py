@@ -41,8 +41,8 @@ async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only
                                 )
                       ))
                 ORDER BY 
-                    timestamp DESC,
-                    CASE WHEN message_type = 'user' THEN 1 ELSE 0 END
+                    timestamp ASC,
+                    CASE WHEN message_type = 'bot' THEN 1 ELSE 0 END
                 LIMIT ? OFFSET ?
             '''
             result = await execute_query(query, (user_id, user_id, limit, offset))
