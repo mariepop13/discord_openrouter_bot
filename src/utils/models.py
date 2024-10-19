@@ -8,5 +8,6 @@ CHAT_MODELS = [
 GENERATE_IMAGE_MODELS = [
     "black-forest-labs/flux-1.1-pro",
     "black-forest-labs/flux-dev",
-    "black-forest-labs/flux-schnell"
+    "black-forest-labs/flux-schnell",
+    "fofr/sticker-maker"
 ]
