@@ -7,6 +7,7 @@ from src.core.bot_initialization import initialize_bot
 from src.core.command_registration import register_commands
 from src.utils.logging_utils import get_logger
 from src.commands.history_command import register_history_command
+from src.database.database_schema import setup_database
 
 # Configure logging
 logger = get_logger(__name__)
@@ -15,11 +16,15 @@ logger = get_logger(__name__)
 load_dotenv()
 logger.debug("Environment variables loaded.")
 
-def setup_bot():
+async def setup_bot():
     # Initialize the bot with command prefix
     bot = initialize_bot()
     bot.command_prefix = '!'
     logger.debug("Bot initialized.")
+
+    # Set up the database
+    await setup_database()
+    logger.debug("Database setup completed.")
 
     # Register commands
     register_commands(bot)
@@ -53,8 +58,8 @@ async def attempt_reconnect(bot, max_retries=5, delay=5):
     logger.error(f"Failed to reconnect after {max_retries} attempts. Please check your internet connection and Discord's status.")
     return False
 
-def run_bot():
-    bot = setup_bot()
+async def run_bot():
+    bot = await setup_bot()
     logger.debug("Starting the bot.")
     token = os.getenv('DISCORD_TOKEN')
     if not token:
@@ -63,10 +68,10 @@ def run_bot():
 
     while True:
         try:
-            bot.run(token)
+            await bot.start(token)
         except errors.ConnectionClosed:
             logger.warning("Connection closed. Attempting to reconnect...")
-            if not asyncio.run(attempt_reconnect(bot)):
+            if not await attempt_reconnect(bot):
                 logger.error("Failed to reconnect after multiple attempts. Exiting.")
                 break
         except KeyboardInterrupt:
@@ -78,4 +83,4 @@ def run_bot():
     logger.debug("Bot has stopped running.")
 
 if __name__ == "__main__":
-    run_bot()
+    asyncio.run(run_bot())

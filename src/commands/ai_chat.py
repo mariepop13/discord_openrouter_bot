@@ -40,11 +40,21 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
 
         formatted_history.append({"role": "user", "content": personalized_message})
 
+        # Check if the message starts with @bot or if it's an /ai command
+        should_mention_user = message.startswith('@bot') or (is_interaction(ctx) and ctx.command.name == 'ai')
+
         bot_response = await chat_with_ai(formatted_history, max_tokens)
         logging.debug(f"Bot response: {bot_response}")
 
+        # If the user used @bot or /ai, prepend the response with @personne
+        mentioned_user_id = None
+        if should_mention_user:
+            user_mention = f"<@{user_id}>"
+            bot_response = f"{user_mention} {bot_response}"
+            mentioned_user_id = user_id
+
         await insert_message(user_id, channel_id, message, model, 'user')
-        await insert_message(CLIENT_ID, channel_id, bot_response, model, 'bot')
+        await insert_message(CLIENT_ID, channel_id, bot_response, model, 'bot', mentioned_user_id)
 
         await send_message(ctx, bot_response)
         update_cooldown(user_id)
