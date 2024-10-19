@@ -1,7 +1,7 @@
 import os
 import asyncio
 from dotenv import load_dotenv
-from discord import errors
+from discord import errors, Intents
 from discord.ext import commands
 from src.core.bot_initialization import initialize_bot
 from src.core.command_registration import register_commands
@@ -81,6 +81,28 @@ async def run_bot():
             logger.error(f"An unexpected error occurred: {e}")
             break
     logger.debug("Bot has stopped running.")
+
+def setup_and_run_bot():
+    token = os.getenv('DISCORD_TOKEN')
+    if not token:
+        logger.error("DISCORD_TOKEN not found in .env file")
+        return
+
+    intents = Intents.default()
+    intents.message_content = True  # Enable message content intent if needed
+    bot = commands.Bot(command_prefix='!', intents=intents)
+    
+    @bot.event
+    async def on_ready():
+        logger.info(f"Bot {bot.user.name} is ready.")
+        
+    @bot.event
+    async def setup_hook():
+        await setup_database()
+        register_commands(bot)
+        register_history_command(bot)
+
+    bot.run(token)
 
 if __name__ == "__main__":
     asyncio.run(run_bot())
