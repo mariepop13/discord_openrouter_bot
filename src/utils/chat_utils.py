@@ -1,5 +1,5 @@
 import aiohttp
-from .config import OPENROUTER_URL, CHAT_DATA, get_headers
+from src.config import OPENROUTER_URL, CHAT_DATA, get_headers
 
 async def chat_with_ai(messages, max_tokens=None):
     headers = get_headers()
