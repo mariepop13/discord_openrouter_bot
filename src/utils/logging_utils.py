@@ -35,8 +35,8 @@ def setup_logging(log_file_path, use_color=False):
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
 
-    # Create a rotating file handler
-    file_handler = RotatingFileHandler(log_file_path, maxBytes=10*1024*1024, backupCount=5)
+    # Create a rotating file handler with reduced backup count
+    file_handler = RotatingFileHandler(log_file_path, maxBytes=5*1024*1024, backupCount=2)
     file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     file_handler.setLevel(logging.DEBUG)
 

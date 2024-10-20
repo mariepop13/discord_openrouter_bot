@@ -2,6 +2,9 @@ import os
 import glob
 from pathlib import Path
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger(__name__)
 
 def cleanup_logs(log_dir='logs', keep_latest=None):
     """
@@ -10,11 +13,22 @@ def cleanup_logs(log_dir='logs', keep_latest=None):
     :param log_dir: The directory containing the log files
     :param keep_latest: The number of log files to keep (overrides .env value if provided)
     """
-    load_dotenv()
+    logger.debug(f"Current working directory: {os.getcwd()}")
+    dotenv_path = Path('.env')
+    logger.debug(f"Loading .env file from: {dotenv_path.absolute()}")
+    
+    # Load .env file
+    load_dotenv(dotenv_path)
+    
+    # Explicitly read from .env file
+    env_value = os.getenv('LOG_FILES_TO_KEEP')
+    logger.debug(f"LOG_FILES_TO_KEEP from os.environ: {env_value}")
     
     # Use the value from .env if keep_latest is not provided
     if keep_latest is None:
-        keep_latest = int(os.getenv('LOG_FILES_TO_KEEP', 5))
+        keep_latest = int(env_value) if env_value is not None else 5
+    
+    logger.info(f"Keeping {keep_latest} most recent log files")
     
     # Full path to the log directory
     log_path = Path(log_dir)
@@ -32,9 +46,12 @@ def cleanup_logs(log_dir='logs', keep_latest=None):
     for file in sorted_files[keep_latest:]:
         try:
             os.remove(file)
-            print(f"File deleted: {file}")
+            logger.info(f"File deleted: {file}")
         except Exception as e:
-            print(f"Error deleting {file}: {e}")
+            logger.error(f"Error deleting {file}: {e}")
+    
+    logger.info("Log cleanup completed")
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     cleanup_logs()
