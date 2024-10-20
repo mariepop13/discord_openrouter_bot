@@ -1,13 +1,10 @@
 import discord
-import asyncio
-import logging
 from src.utils.image_generation import generate_image
 from src.commands.image_analysis import analyze_image_command as analyze_image_impl
 from src.utils.models import GENERATE_IMAGE_MODELS
+from src.utils.logging_setup import setup_logger
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__)
 
 async def generate_image_command(interaction: discord.Interaction, prompt: str, model: str = "black-forest-labs/flux-dev", bot=None):
     if model not in GENERATE_IMAGE_MODELS:
@@ -21,16 +18,13 @@ async def generate_image_command(interaction: discord.Interaction, prompt: str, 
         output = await generate_image(prompt, model)
         logger.debug(f"Output from generate_image: {output}")
 
-        # Ensure we're using the actual model name in the message
         actual_model = model if model != "black-forest-labs/flux-dev" else "black-forest-labs/flux-dev"
 
         if isinstance(output, str) and output.startswith("http"):
-            # This handles the flux-1.1-pro model and any other model that returns a direct URL
             logger.debug(f"Image generated successfully for prompt: {prompt}")
             message = f"Generated image using model: {actual_model}\n{output}"
             await interaction.followup.send(content=message)
         elif isinstance(output, dict) and 'local_path' in output and 'url' in output:
-            # This handles models that return a dictionary with local_path and url
             logger.debug(f"Image generated successfully for prompt: {prompt}")
             message = f"Generated image using model: {actual_model}"
             file = discord.File(output['local_path'], filename='generated_image.webp')

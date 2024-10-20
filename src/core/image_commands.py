@@ -2,9 +2,9 @@ import discord
 from discord import app_commands
 from src.commands.image_commands import analyze_image_command, generate_image_command
 from src.utils.models import GENERATE_IMAGE_MODELS
-import logging
+from src.utils.logging_setup import setup_logger
 
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__)
 
 def register_image_commands(bot):
     @bot.tree.command(name="analyze", description="Analyze an attached image")
@@ -27,3 +27,5 @@ def register_image_commands(bot):
         logger.debug(f"Received /generate_image command with prompt: {prompt}, model: {model}")
         await interaction.response.defer()
         await generate_image_command(interaction, prompt, model, bot)
+
+    logger.info("Image commands registered successfully")
