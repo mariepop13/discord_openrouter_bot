@@ -22,5 +22,12 @@ def setup_bot():
     asyncio.run(setup_database())
     logger.debug("Database setup completed.")
     
+    @bot.event
+    async def on_ready():
+        logger.info(f"Logged in as {bot.user.name}")
+        logger.info("Syncing commands...")
+        await bot.tree.sync()
+        logger.info("Commands synced successfully.")
+    
     logger.debug("Bot setup completed in bot_setup.py")
     return bot

@@ -25,7 +25,14 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
     logging.debug(f"AI command called for user {user_id} in channel {channel_id}")
     
     if is_interaction(ctx):
-        await ctx.response.defer(thinking=True)
+        try:
+            await ctx.response.defer(thinking=True)
+        except discord.errors.NotFound:
+            logging.warning(f"Interaction not found for user {user_id}. It may have already been responded to or timed out.")
+            return
+        except Exception as e:
+            logging.error(f"Error deferring interaction: {str(e)}", exc_info=True)
+            return
     
     try:
         ai_prefs = await get_ai_preferences(user_id)

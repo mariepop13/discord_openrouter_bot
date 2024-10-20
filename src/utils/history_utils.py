@@ -17,22 +17,27 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
         from src.views.history_pagination import HistoryPaginationView
         
         logging.debug(f"Fetching history for channel {channel_id}, page {page}, filter_type {filter_type}, user {user}")
-        offset = (page - 1) * MESSAGES_PER_PAGE
         
         user_id = user.id if user else interaction.user.id
-        chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
         total_messages = await get_history(user_id, count_only=True)
+        
+        # Calculate the correct offset for reversed order
+        total_pages = (total_messages + MESSAGES_PER_PAGE - 1) // MESSAGES_PER_PAGE
+        offset = max(0, total_messages - page * MESSAGES_PER_PAGE)
+        
+        chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
         
         if not chat_history:
             await send_no_history_message(interaction, page, user, ephemeral)
             return
         
+        # Reverse the order of messages
+        chat_history.reverse()
+        
         filtered_history = filter_history(chat_history, filter_type)
         formatted_history = format_history(filtered_history)
         chunks = create_chunks(formatted_history)
         
-        total_pages = (total_messages + MESSAGES_PER_PAGE - 1) // MESSAGES_PER_PAGE
-
         embed = create_history_embed(interaction, page, total_pages, chunks, offset, total_messages, user)
         
         view = HistoryPaginationView(interaction.user.id, channel_id, page, total_pages, filter_type, show_history_page, user)
@@ -87,7 +92,12 @@ def create_history_embed(interaction: discord.Interaction, page, total_pages, ch
         description=chunks[0] if chunks else "No messages to display for this filter.",
         color=discord.Color.blue()
     )
-    embed.set_footer(text=f"Showing messages {offset + 1}-{min(offset + MESSAGES_PER_PAGE, total_messages)} out of {total_messages}")
+    
+    # Update the footer to reflect the reversed order
+    start_message = max(1, total_messages - offset - MESSAGES_PER_PAGE + 1)
+    end_message = total_messages - offset
+    embed.set_footer(text=f"Showing messages {start_message}-{end_message} out of {total_messages}")
+    
     return embed
 
 async def handle_history_error(interaction: discord.Interaction, channel_id, error, ephemeral: bool = True):

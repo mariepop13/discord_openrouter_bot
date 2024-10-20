@@ -21,7 +21,21 @@ def register_ai_commands(bot):
     @app_commands.describe(message="Your message to the AI")
     async def ai_command_wrapper(interaction: discord.Interaction, message: str):
         logger.debug(f"Received /ai command with message: {message}")
-        await ai_command(interaction, message)
+        try:
+            await ai_command(interaction, message)
+        except discord.errors.NotFound:
+            logger.warning(f"Interaction not found for user {interaction.user.id}. It may have already been responded to or timed out.")
+            # Attempt to send a follow-up message if the original interaction is no longer valid
+            try:
+                await interaction.followup.send("Sorry, there was a delay in processing your request. Please try again.", ephemeral=True)
+            except discord.errors.HTTPException:
+                logger.error("Failed to send follow-up message after interaction not found error.")
+        except Exception as e:
+            logger.error(f"Error in ai_command_wrapper: {str(e)}", exc_info=True)
+            try:
+                await interaction.followup.send("An error occurred while processing your request. Please try again later.", ephemeral=True)
+            except discord.errors.HTTPException:
+                logger.error("Failed to send error message to user.")
 
     @bot.tree.command(name="update_ai_settings", description="Update AI settings")
     @app_commands.describe(

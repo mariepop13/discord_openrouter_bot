@@ -1,5 +1,6 @@
 import os
 import discord
+from discord import Permissions
 from discord.ext import commands
 from dotenv import load_dotenv
 from src.commands.ai_chat import ai_command
@@ -48,7 +49,14 @@ def initialize_bot():
         
         client_id = os.getenv('CLIENT_ID')
         if client_id:
-            permissions = discord.Permissions.text()
+            # Create permissions that include text permissions and the ability to delete messages
+            permissions = Permissions(
+            send_messages=True,        # Send messages (for general commands like /help, /ping)
+            read_messages=True,        # Read messages (to respond to commands and read channels)
+            manage_messages=True,      # Manage messages (for commands like /clear)
+            view_channel=True,         # View channels (to access multiple channels)
+            read_message_history=True  # Read message history (for /history command)
+            )
             invite_link = discord.utils.oauth_url(client_id, permissions=permissions, scopes=("bot", "applications.commands"))
             logger.info(f"Bot invite link: {invite_link}")
         else:
