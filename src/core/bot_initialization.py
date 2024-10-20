@@ -33,6 +33,21 @@ def initialize_bot():
     
     bot = create_bot()
 
+    # Generate and log the invite link
+    client_id = os.getenv('CLIENT_ID')
+    if client_id:
+        permissions = Permissions(
+            send_messages=True,
+            read_messages=True,
+            manage_messages=True,
+            view_channel=True,
+            read_message_history=True
+        )
+        invite_link = discord.utils.oauth_url(client_id, permissions=permissions, scopes=("bot", "applications.commands"))
+        logger.info(f"Bot invite link: {invite_link}")
+    else:
+        logger.warning("CLIENT_ID not found in .env file. Invite link couldn't be generated.")
+
     @bot.event
     async def on_ready():
         logger.info(f"Bot '{bot.bot_name}' is ready.")
@@ -46,21 +61,6 @@ def initialize_bot():
         # Set the bot's status to online with a custom activity
         await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Ready to chat!"))
         logger.info("Bot status set to online with 'Ready to chat!' activity.")
-        
-        client_id = os.getenv('CLIENT_ID')
-        if client_id:
-            # Create permissions that include text permissions and the ability to delete messages
-            permissions = Permissions(
-            send_messages=True,        # Send messages (for general commands like /help, /ping)
-            read_messages=True,        # Read messages (to respond to commands and read channels)
-            manage_messages=True,      # Manage messages (for commands like /clear)
-            view_channel=True,         # View channels (to access multiple channels)
-            read_message_history=True  # Read message history (for /history command)
-            )
-            invite_link = discord.utils.oauth_url(client_id, permissions=permissions, scopes=("bot", "applications.commands"))
-            logger.info(f"Bot invite link: {invite_link}")
-        else:
-            logger.warning("CLIENT_ID not found in .env file. Invite link couldn't be generated.")
 
         await force_sync(bot)
 
