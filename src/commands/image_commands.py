@@ -1,10 +1,25 @@
 import discord
+import aiohttp
+import os
+from datetime import datetime
 from src.utils.image_generation import generate_image
 from src.commands.image_analysis import analyze_image_command as analyze_image_impl
 from src.utils.models import GENERATE_IMAGE_MODELS
 from src.utils.logging_setup import setup_logger
 
 logger = setup_logger(__name__)
+
+async def download_image(url, filename):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                with open(filename, 'wb') as f:
+                    f.write(await resp.read())
+                return True
+    return False
+
+def get_timestamp_filename():
+    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S.webp")
 
 async def generate_image_command(interaction: discord.Interaction, prompt: str, model: str = "black-forest-labs/flux-dev", bot=None):
     if model not in GENERATE_IMAGE_MODELS:
@@ -19,15 +34,23 @@ async def generate_image_command(interaction: discord.Interaction, prompt: str, 
         logger.debug(f"Output from generate_image: {output}")
 
         actual_model = model if model != "black-forest-labs/flux-dev" else "black-forest-labs/flux-dev"
+        timestamp_filename = get_timestamp_filename()
+        local_filename = f"generated_images/{timestamp_filename}"
 
         if isinstance(output, str) and output.startswith("http"):
             logger.debug(f"Image generated successfully for prompt: {prompt}")
-            message = f"Generated image using model: {actual_model}\n{output}"
-            await interaction.followup.send(content=message)
+            message = f"Generated image using model: {actual_model}"
+            
+            if await download_image(output, local_filename):
+                file = discord.File(local_filename, filename=timestamp_filename)
+                await interaction.followup.send(content=message, file=file)
+            else:
+                await interaction.followup.send(f"{message}\nFailed to download the image, but you can view it here: {output}")
         elif isinstance(output, dict) and 'local_path' in output and 'url' in output:
             logger.debug(f"Image generated successfully for prompt: {prompt}")
             message = f"Generated image using model: {actual_model}"
-            file = discord.File(output['local_path'], filename='generated_image.webp')
+            os.rename(output['local_path'], local_filename)
+            file = discord.File(local_filename, filename=timestamp_filename)
             try:
                 await interaction.followup.send(content=message, file=file)
             except discord.HTTPException as e:
