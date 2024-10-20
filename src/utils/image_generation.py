@@ -2,10 +2,11 @@ import replicate
 import uuid
 from pathlib import Path
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
-async def generate_image(prompt, model="black-forest-labs/flux-dev"):
+async def generate_image(prompt, model="black-forest-labs/flux-dev", local_filename=None):
     logger.debug(f"Generating image with prompt: {prompt}, model: {model}")
     try:
         output = await replicate.async_run(
@@ -16,7 +17,27 @@ async def generate_image(prompt, model="black-forest-labs/flux-dev"):
         
         if model == "black-forest-labs/flux-1.1-pro":
             if isinstance(output, list) and len(output) > 0:
-                return output[0]
+                image_url = output[0]
+                # Use provided local_filename or generate a unique one
+                filepath = Path(local_filename) if local_filename else Path("generated_images") / f"{uuid.uuid4()}.webp"
+                
+                # Ensure the directory exists
+                filepath.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Download and save the image locally
+                response = requests.get(image_url)
+                if response.status_code == 200:
+                    with open(filepath, 'wb') as file:
+                        file.write(response.content)
+                    
+                    # Return the local file path and the URL
+                    return {
+                        "local_path": str(filepath),
+                        "url": image_url
+                    }
+                else:
+                    logger.warning(f"Failed to download image from URL: {image_url}")
+                    return image_url
             elif isinstance(output, str):
                 return output
             else:
@@ -24,9 +45,8 @@ async def generate_image(prompt, model="black-forest-labs/flux-dev"):
                 return str(output)
         else:
             if isinstance(output, list) and len(output) > 0:
-                # Generate a unique filename
-                filename = f"{uuid.uuid4()}.webp"
-                filepath = Path("generated_images") / filename
+                # Use provided local_filename or generate a unique one
+                filepath = Path(local_filename) if local_filename else Path("generated_images") / f"{uuid.uuid4()}.webp"
                 
                 # Ensure the directory exists
                 filepath.parent.mkdir(parents=True, exist_ok=True)
