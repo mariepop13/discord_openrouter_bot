@@ -6,7 +6,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-async def generate_image(prompt, model="black-forest-labs/flux-dev"):
+async def generate_image(prompt, model="black-forest-labs/flux-dev", local_filename=None):
     logger.debug(f"Generating image with prompt: {prompt}, model: {model}")
     try:
         output = await replicate.async_run(
@@ -18,9 +18,8 @@ async def generate_image(prompt, model="black-forest-labs/flux-dev"):
         if model == "black-forest-labs/flux-1.1-pro":
             if isinstance(output, list) and len(output) > 0:
                 image_url = output[0]
-                # Generate a unique filename
-                filename = f"{uuid.uuid4()}.webp"
-                filepath = Path("generated_images") / filename
+                # Use provided local_filename or generate a unique one
+                filepath = Path(local_filename) if local_filename else Path("generated_images") / f"{uuid.uuid4()}.webp"
                 
                 # Ensure the directory exists
                 filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -46,9 +45,8 @@ async def generate_image(prompt, model="black-forest-labs/flux-dev"):
                 return str(output)
         else:
             if isinstance(output, list) and len(output) > 0:
-                # Generate a unique filename
-                filename = f"{uuid.uuid4()}.webp"
-                filepath = Path("generated_images") / filename
+                # Use provided local_filename or generate a unique one
+                filepath = Path(local_filename) if local_filename else Path("generated_images") / f"{uuid.uuid4()}.webp"
                 
                 # Ensure the directory exists
                 filepath.parent.mkdir(parents=True, exist_ok=True)

@@ -30,32 +30,40 @@ async def generate_image_command(interaction: discord.Interaction, prompt: str, 
     await interaction.followup.send("Generating image... This may take a few minutes.")
 
     try:
-        output = await generate_image(prompt, model)
-        logger.debug(f"Output from generate_image: {output}")
-
-        actual_model = model if model != "black-forest-labs/flux-dev" else "black-forest-labs/flux-dev"
         timestamp_filename = get_timestamp_filename()
         local_filename = f"generated_images/{timestamp_filename}"
 
+        # Create the directory if it doesn't exist
+        os.makedirs(os.path.dirname(local_filename), exist_ok=True)
+
+        output = await generate_image(prompt, model, local_filename)
+        
+        logger.debug(f"Output from generate_image: {output if isinstance(output, str) else {k: v for k, v in output.items() if k != 'url'}}")
+
+        actual_model = model if model != "black-forest-labs/flux-dev" else "black-forest-labs/flux-dev"
+        message = f"Generated image using model: {actual_model}"
+
         if isinstance(output, str) and output.startswith("http"):
             logger.debug(f"Image generated successfully for prompt: {prompt}")
-            message = f"Generated image using model: {actual_model}"
-            
             if await download_image(output, local_filename):
-                file = discord.File(local_filename, filename=timestamp_filename)
-                await interaction.followup.send(content=message, file=file)
+                if os.path.exists(local_filename) and os.path.getsize(local_filename) > 0:
+                    file = discord.File(local_filename, filename=timestamp_filename)
+                    await interaction.followup.send(content=message, file=file)
+                else:
+                    await interaction.followup.send(f"{message}\nThe image was generated but the file is empty. You can view it here: {output}")
             else:
                 await interaction.followup.send(f"{message}\nFailed to download the image, but you can view it here: {output}")
-        elif isinstance(output, dict) and 'local_path' in output and 'url' in output:
+        elif isinstance(output, dict) and 'local_path' in output:
             logger.debug(f"Image generated successfully for prompt: {prompt}")
-            message = f"Generated image using model: {actual_model}"
-            os.rename(output['local_path'], local_filename)
-            file = discord.File(local_filename, filename=timestamp_filename)
-            try:
-                await interaction.followup.send(content=message, file=file)
-            except discord.HTTPException as e:
-                logger.error(f"Failed to send message: {str(e)}")
-                await interaction.followup.send("The image was generated, but I couldn't send it due to a Discord error. Please try again.")
+            if os.path.exists(output['local_path']) and os.path.getsize(output['local_path']) > 0:
+                file = discord.File(output['local_path'], filename=timestamp_filename)
+                try:
+                    await interaction.followup.send(content=message, file=file)
+                except discord.HTTPException as e:
+                    logger.error(f"Failed to send message: {str(e)}")
+                    await interaction.followup.send("The image was generated, but I couldn't send it due to a Discord error. Please try again.")
+            else:
+                await interaction.followup.send(f"{message}\nThe image was generated but the file is empty or missing.")
         else:
             logger.warning(f"Unexpected output format: {output}")
             await interaction.followup.send(f"Sorry, I couldn't generate the image. Unexpected output: {output}")
