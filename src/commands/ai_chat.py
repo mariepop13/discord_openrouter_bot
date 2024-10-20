@@ -5,7 +5,8 @@ import os
 
 from src.utils.chat_utils import chat_with_ai
 from src.database.database_operations import get_personalization, get_ai_preferences
-from src.database.message_operations import insert_message, get_messages_for_channel
+from src.database.message_insertion import insert_message
+from src.database.channel_messages import get_messages_for_channel
 from src.commands.cooldown import is_on_cooldown, update_cooldown
 from src.utils.message_utils import get_personalized_message, format_chat_history
 from src.utils.discord_utils import send_message, get_user_id, get_channel_id, is_interaction
@@ -40,11 +41,21 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
 
         formatted_history.append({"role": "user", "content": personalized_message})
 
+        # Check if the message starts with @bot or if it's an /ai command
+        should_mention_user = message.startswith('@bot') or (is_interaction(ctx) and ctx.command.name == 'ai')
+
         bot_response = await chat_with_ai(formatted_history, max_tokens)
         logging.debug(f"Bot response: {bot_response}")
 
+        # If the user used @bot or /ai, prepend the response with @personne
+        mentioned_user_id = None
+        if should_mention_user:
+            user_mention = f"<@{user_id}>"
+            bot_response = f"{user_mention} {bot_response}"
+            mentioned_user_id = user_id
+
         await insert_message(user_id, channel_id, message, model, 'user')
-        await insert_message(CLIENT_ID, channel_id, bot_response, model, 'bot')
+        await insert_message(CLIENT_ID, channel_id, bot_response, model, 'bot', mentioned_user_id)
 
         await send_message(ctx, bot_response)
         update_cooldown(user_id)

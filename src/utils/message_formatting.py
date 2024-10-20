@@ -1,7 +1,7 @@
 from datetime import datetime
 from src.config import MAX_MESSAGE_LENGTH
 
-def format_message(message_user_id, content, model, message_type, timestamp):
+def format_message(message_user_id, content, model, message_type, timestamp, mentioned_user_id=None):
     formatted_time = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     
     if message_type == 'user':
@@ -17,7 +17,10 @@ def format_message(message_user_id, content, model, message_type, timestamp):
         icon = "❓"
         sender = "Unknown"
     
-    formatted_message = f"{icon} **{sender}** - {formatted_time}\n{content[:MAX_MESSAGE_LENGTH]}"
+    formatted_message = f"{icon} **{sender}** - {formatted_time}"
+    
+    formatted_message += f"\n{content[:MAX_MESSAGE_LENGTH]}"
+    
     if len(content) > MAX_MESSAGE_LENGTH:
         formatted_message += "\n*(Message truncated)*"
     

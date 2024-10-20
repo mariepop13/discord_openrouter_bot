@@ -1,7 +1,7 @@
 import discord
 import logging
 from typing import List
-from src.database.message_operations import get_messages_for_channel, get_messages_for_user
+from src.database.history_retrieval import get_history
 from src.utils.message_formatting import format_message
 from src.config import MAX_EMBED_LENGTH, MESSAGES_PER_PAGE
 
@@ -19,12 +19,9 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
         logging.debug(f"Fetching history for channel {channel_id}, page {page}, filter_type {filter_type}, user {user}")
         offset = (page - 1) * MESSAGES_PER_PAGE
         
-        if user:
-            chat_history = await get_messages_for_user(user.id, channel_id, MESSAGES_PER_PAGE, offset)
-            total_messages = len(await get_messages_for_user(user.id, channel_id))
-        else:
-            chat_history = await get_messages_for_channel(channel_id, MESSAGES_PER_PAGE, offset)
-            total_messages = len(await get_messages_for_channel(channel_id))
+        user_id = user.id if user else interaction.user.id
+        chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
+        total_messages = await get_history(user_id, count_only=True)
         
         if not chat_history:
             await send_no_history_message(interaction, page, user, ephemeral)
@@ -65,8 +62,16 @@ def filter_history(chat_history, filter_type):
     ]
 
 def format_history(filtered_history):
-    # Reverse the order of messages before formatting
-    return "\n\n".join([format_message(*message) for message in reversed(filtered_history)])
+    return "\n\n".join([
+        format_message(
+            message[0],  # user_id
+            message[1],  # content
+            message[2],  # model
+            message[3],  # message_type
+            message[4],  # timestamp
+            message[5] if len(message) > 5 else None  # mentioned_user_id (if present)
+        ) for message in filtered_history
+    ])
 
 def create_chunks(formatted_history):
     return [formatted_history[i:i+MAX_EMBED_LENGTH] for i in range(0, len(formatted_history), MAX_EMBED_LENGTH)]

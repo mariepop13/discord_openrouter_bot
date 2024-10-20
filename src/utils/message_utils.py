@@ -19,7 +19,7 @@ def get_personalized_message(personalization: tuple, message: str) -> str:
 
 def format_chat_history(history):
     formatted_history = []
-    for user_id, content, model, message_type, timestamp in history:
+    for user_id, content, model, message_type, timestamp, mentioned_user_id in history:
         if message_type == "user":
             role = "user"
         elif message_type == "bot":
@@ -29,6 +29,11 @@ def format_chat_history(history):
             content = f"Image analysis: {content}"
         else:
             role = "system"
+        
+        # Remove the line that adds mention information to the content
+        # if mentioned_user_id:
+        #     content = f"[Mentioning User ID: {mentioned_user_id}] {content}"
+        
         formatted_history.append({"role": role, "content": content})
     logging.debug(f"Formatted chat history: {formatted_history}")
     return formatted_history

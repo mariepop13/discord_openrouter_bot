@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from datetime import datetime
-from src.core.bot import run_bot
+from src.core.bot import setup_and_run_bot
 from src.utils.logging_utils import setup_logging, get_logger
 
 def main():
@@ -23,7 +23,7 @@ def main():
     print("3. If issues persist, restart the bot and use '!forcesync' again.")
     print("\nNote: There may be a delay between syncing commands and their visibility in Discord.")
     
-    run_bot()
+    setup_and_run_bot()
     
     logger.debug("Bot script execution completed.")
     print("Bot has been shut down. You can close this window.")

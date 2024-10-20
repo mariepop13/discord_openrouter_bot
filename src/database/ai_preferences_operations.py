@@ -1,9 +1,7 @@
 from typing import List, Tuple, Optional, Any
 from .database_connection import execute_query
+from src.config import DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT
 import logging
-
-DEFAULT_AI_MODEL = "google/gemini-flash-1.5"
-DEFAULT_MAX_OUTPUT = 150
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -16,10 +14,10 @@ async def get_ai_preferences(user_id: int) -> Tuple[str, int]:
             logging.debug(f"AI preferences found for user_id {user_id}: {result}")
         else:
             logging.debug(f"No AI preferences found for user_id {user_id}, using defaults.")
-        return result if result else (DEFAULT_AI_MODEL, DEFAULT_MAX_OUTPUT)
+        return result if result else (DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT)
     except Exception as e:
         logging.error(f"Error getting AI preferences for user_id {user_id}: {str(e)}")
-        return DEFAULT_AI_MODEL, DEFAULT_MAX_OUTPUT
+        return DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT
 
 async def set_ai_preferences(user_id: int, ai_model: Optional[str] = None, max_output: Optional[int] = None) -> None:
     logging.debug(f"Setting AI preferences for user_id: {user_id}, ai_model: {ai_model}, max_output: {max_output}")

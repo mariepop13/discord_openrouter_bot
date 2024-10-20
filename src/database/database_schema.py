@@ -14,6 +14,7 @@ async def create_tables():
             content TEXT,
             model TEXT,
             message_type TEXT,
+            mentioned_user_id INTEGER,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -45,7 +46,7 @@ async def run_migrations():
     logging.debug("Running migrations.")
     migrations = {
         'personalization': ['ai_model', 'max_output'],
-        'messages': ['message_type', 'channel_id']
+        'messages': ['message_type', 'channel_id', 'mentioned_user_id']
     }
     
     for table, new_columns in migrations.items():
@@ -53,7 +54,7 @@ async def run_migrations():
         for column in new_columns:
             if column not in existing_columns:
                 logging.debug(f"Adding {column} column to {table} table")
-                column_type = 'INTEGER' if column == 'channel_id' else 'TEXT'
+                column_type = 'INTEGER' if column in ['channel_id', 'mentioned_user_id'] else 'TEXT'
                 await execute_query(f"ALTER TABLE {table} ADD COLUMN {column} {column_type}")
     logging.debug("Migrations completed.")
 

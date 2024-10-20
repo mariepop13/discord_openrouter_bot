@@ -1,6 +1,6 @@
 import aiohttp
-from .config import OPENROUTER_URL, ANALYZE_DATA
-from .config import get_headers
+from src.config import OPENROUTER_URL, IMAGE_ANALYSIS_MODEL
+from src.config import get_headers
 
 async def analyze_image(image_url, chat_history=None):
     headers = get_headers()
@@ -15,7 +15,7 @@ async def analyze_image(image_url, chat_history=None):
     })
 
     analyze_data = {
-        "model": ANALYZE_DATA,
+        "model": IMAGE_ANALYSIS_MODEL,
         "messages": messages
     }
 

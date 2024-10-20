@@ -1,69 +1,12 @@
-from .database_connection import execute_query
-import logging
-from typing import List, Tuple
+from .message_insertion import insert_message
+from .channel_messages import get_messages_for_channel
+from .user_messages import get_messages_for_user
+from .last_message import get_last_message_for_channel
 
-async def insert_message(user_id: int, channel_id: int, content: str, model: str, message_type: str) -> None:
-    logging.debug(f"Attempting to insert message: user_id={user_id}, channel_id={channel_id}, content={content}, model={model}, message_type={message_type}")
-    try:
-        await execute_query('INSERT INTO messages (user_id, channel_id, content, model, message_type) VALUES (?, ?, ?, ?, ?)',
-                            (user_id, channel_id, content, model, message_type))
-        logging.debug("Message inserted successfully")
-    except Exception as e:
-        logging.error(f"Error inserting message: {str(e)}")
-        raise
-
-async def get_messages_for_channel(channel_id: int, limit: int = 50, offset: int = 0) -> List[Tuple]:
-    logging.debug(f"Attempting to retrieve messages for channel_id={channel_id}, limit={limit}, offset={offset}")
-    try:
-        result = await execute_query('''
-            SELECT user_id, content, model, message_type, timestamp 
-            FROM messages 
-            WHERE channel_id = ? 
-            ORDER BY 
-                timestamp DESC,
-                CASE WHEN message_type = 'bot' THEN 1 ELSE 0 END
-            LIMIT ? OFFSET ?
-        ''', (channel_id, limit, offset))
-        logging.debug(f"Retrieved {len(result)} messages for channel {channel_id}")
-        return result
-    except Exception as e:
-        logging.error(f"Error retrieving messages for channel {channel_id}: {str(e)}")
-        raise
-
-async def get_messages_for_user(user_id: int, channel_id: int, limit: int = 50, offset: int = 0) -> List[Tuple]:
-    logging.debug(f"Attempting to retrieve messages for user_id={user_id}, channel_id={channel_id}, limit={limit}, offset={offset}")
-    try:
-        result = await execute_query('''
-            SELECT user_id, content, model, message_type, timestamp 
-            FROM messages 
-            WHERE user_id = ? AND channel_id = ? 
-            ORDER BY 
-                timestamp DESC,
-                CASE WHEN message_type = 'bot' THEN 1 ELSE 0 END
-            LIMIT ? OFFSET ?
-        ''', (user_id, channel_id, limit, offset))
-        logging.debug(f"Retrieved {len(result)} messages for user {user_id} in channel {channel_id}")
-        return result
-    except Exception as e:
-        logging.error(f"Error retrieving messages for user {user_id} in channel {channel_id}: {str(e)}")
-        raise
-
-async def get_last_message_for_channel(channel_id: int) -> Tuple:
-    logging.debug(f"Attempting to retrieve last message for channel_id={channel_id}")
-    try:
-        result = await execute_query('''
-            SELECT user_id, content, model, message_type, timestamp 
-            FROM messages 
-            WHERE channel_id = ? 
-            ORDER BY timestamp DESC 
-            LIMIT 1
-        ''', (channel_id,))
-        if result:
-            logging.debug(f"Retrieved last message for channel {channel_id}")
-            return result[0]
-        else:
-            logging.debug(f"No messages found for channel {channel_id}")
-            return None
-    except Exception as e:
-        logging.error(f"Error retrieving last message for channel {channel_id}: {str(e)}")
-        raise
+# Re-export the functions
+__all__ = [
+    'insert_message',
+    'get_messages_for_channel',
+    'get_messages_for_user',
+    'get_last_message_for_channel'
+]
