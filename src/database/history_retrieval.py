@@ -9,12 +9,13 @@ async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only
             query = '''
                 SELECT COUNT(DISTINCT id) FROM (
                     SELECT id FROM messages
-                    WHERE user_id = ? OR mentioned_user_id = ?
+                    WHERE user_id = ?
                     UNION
                     SELECT m.id
                     FROM messages m
                     JOIN messages u ON m.timestamp > u.timestamp
                     WHERE u.user_id = ? AND m.message_type = 'bot'
+                    AND m.mentioned_user_id = ?
                     AND m.timestamp <= (
                         SELECT MIN(timestamp)
                         FROM messages
@@ -31,12 +32,13 @@ async def get_history(user_id: int, limit: int = 10, offset: int = 0, count_only
                 SELECT DISTINCT user_id, content, model, message_type, timestamp, mentioned_user_id
                 FROM (
                     SELECT * FROM messages
-                    WHERE user_id = ? OR mentioned_user_id = ?
+                    WHERE user_id = ?
                     UNION
                     SELECT m.*
                     FROM messages m
                     JOIN messages u ON m.timestamp > u.timestamp
                     WHERE u.user_id = ? AND m.message_type = 'bot'
+                    AND m.mentioned_user_id = ?
                     AND m.timestamp <= (
                         SELECT MIN(timestamp)
                         FROM messages
