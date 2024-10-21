@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def register_history_command(bot):
-    @bot.tree.command(name="history", description="View chat history for the current or specified channel")
+    @bot.tree.command(name="history", description="View your chat history or specify a user (admin only) for the current or specified channel")
     @app_commands.describe(
         channel="The channel to view history for (optional)",
         page="The page number to view (default: 1)",
@@ -23,10 +23,14 @@ def register_history_command(bot):
     ):
         logger.debug(f"Received /history command with channel: {channel}, page: {page}, filter_type: {filter_type}, user: {user}")
         
-        if not interaction.user.guild_permissions.administrator:
-            if user:
-                await interaction.response.send_message("You don't have permission to view other users' history.", ephemeral=True)
-                return
+        is_admin = interaction.user.guild_permissions.administrator
+
+        if not is_admin and user and user != interaction.user:
+            await interaction.response.send_message("You don't have permission to view other users' history.", ephemeral=True)
+            return
+
+        # If no user is specified or the user is not an admin, set user to the interaction user
+        if not user or not is_admin:
             user = interaction.user
 
         try:
@@ -39,10 +43,11 @@ def register_history_command(bot):
             else:
                 channel_id = interaction.channel.id
 
+            await interaction.response.defer(ephemeral=True)
             await show_history_page(interaction, channel_id, page, filter_type, user=user, ephemeral=True)
         except Exception as e:
             logger.error(f"Error in history command: {str(e)}")
-            await interaction.response.send_message(f"An error occurred while retrieving history: {str(e)}", ephemeral=True)
+            await interaction.followup.send(f"An error occurred while retrieving history: {str(e)}", ephemeral=True)
 
     @history_command.autocomplete("channel")
     async def history_channel_autocomplete(

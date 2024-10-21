@@ -19,13 +19,15 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
         logging.debug(f"Fetching history for channel {channel_id}, page {page}, filter_type {filter_type}, user {user}")
         
         user_id = user.id if user else interaction.user.id
-        total_messages = await get_history(user_id, count_only=True)
+        total_messages = await get_history(user_id, channel_id, count_only=True)
         
         # Calculate the correct offset for reversed order
         total_pages = (total_messages + MESSAGES_PER_PAGE - 1) // MESSAGES_PER_PAGE
         offset = max(0, total_messages - page * MESSAGES_PER_PAGE)
         
-        chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
+        chat_history = await get_history(user_id, channel_id, MESSAGES_PER_PAGE, offset)
+        
+        logging.debug(f"Retrieved {len(chat_history)} messages from database")
         
         if not chat_history:
             await send_no_history_message(interaction, page, user, ephemeral)
@@ -35,6 +37,10 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
         chat_history.reverse()
         
         filtered_history = filter_history(chat_history, filter_type)
+        
+        bot_message_count = sum(1 for message in filtered_history if message[3] == 'bot')
+        logging.debug(f"Number of bot messages in filtered history: {bot_message_count}")
+        
         formatted_history = format_history(filtered_history)
         chunks = create_chunks(formatted_history)
         
@@ -43,7 +49,7 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
         view = HistoryPaginationView(interaction.user.id, channel_id, page, total_pages, filter_type, show_history_page, user)
         view.update_buttons()
 
-        await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
+        await interaction.followup.send(embed=embed, view=view, ephemeral=ephemeral)
         
         logging.debug(f"Successfully fetched and displayed history for channel {channel_id}, page {page}, user {user}")
 
@@ -55,16 +61,18 @@ async def send_no_history_message(interaction: discord.Interaction, page: int, u
         content = f"No chat history found for user {user.name} in this channel." if page == 1 else "No more history to display for this user."
     else:
         content = "This channel doesn't have any chat history yet." if page == 1 else "No more history to display."
-    await interaction.response.send_message(content, ephemeral=ephemeral)
+    await interaction.followup.send(content, ephemeral=ephemeral)
     logging.debug(f"No chat history found for channel {interaction.channel.id}, page {page}, user {user}")
 
 def filter_history(chat_history, filter_type):
-    return [
+    filtered = [
         message for message in chat_history
         if filter_type == 'all' or
         (filter_type == 'chat' and message[3] in ['user', 'bot']) or
         (filter_type == 'image' and message[3] == 'image_analysis')
     ]
+    logging.debug(f"Filtered history contains {len(filtered)} messages")
+    return filtered
 
 def format_history(filtered_history):
     return "\n\n".join([
@@ -103,4 +111,4 @@ def create_history_embed(interaction: discord.Interaction, page, total_pages, ch
 async def handle_history_error(interaction: discord.Interaction, channel_id, error, ephemeral: bool = True):
     logging.error(f"Error in history command for channel {channel_id}: {str(error)}")
     error_message = "An error occurred while retrieving the chat history. Please try again later."
-    await interaction.response.send_message(error_message, ephemeral=ephemeral)
+    await interaction.followup.send(error_message, ephemeral=ephemeral)

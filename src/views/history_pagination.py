@@ -15,12 +15,14 @@ class HistoryPaginationView(View):
     @discord.ui.button(label="Previous", style=discord.ButtonStyle.gray, disabled=True)
     async def previous_button(self, interaction: discord.Interaction, button: Button):
         if self.current_page > 1:
+            await interaction.response.defer(ephemeral=True)
             self.current_page -= 1
             await self.show_history_page(interaction, self.channel_id, self.current_page, self.filter_type, user=self.target_user, ephemeral=True)
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.gray, disabled=True)
     async def next_button(self, interaction: discord.Interaction, button: Button):
         if self.current_page < self.total_pages:
+            await interaction.response.defer(ephemeral=True)
             self.current_page += 1
             await self.show_history_page(interaction, self.channel_id, self.current_page, self.filter_type, user=self.target_user, ephemeral=True)
 

@@ -22,7 +22,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         logging.debug(f"User {user_id} is on cooldown. Command ignored.")
         return
 
-    logging.debug(f"AI command called for user {user_id} in channel {channel_id}")
+    logging.info(f"AI command called for user {user_id} in channel {channel_id}")
     
     if is_interaction(ctx):
         try:
@@ -43,8 +43,16 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         personalization = await get_personalization(user_id)
         personalized_message = get_personalized_message(personalization, message)
 
-        chat_history = await get_messages_for_channel(channel_id, HISTORY_LIMIT)
+        chat_history = await get_messages_for_channel(channel_id, user_id, HISTORY_LIMIT)
+        
         formatted_history = format_chat_history(chat_history)
+        
+        if not chat_history:
+            logging.info(f"New user detected: Starting new conversation for user {user_id} in channel {channel_id}")
+            system_message = {"role": "system", "content": "This is the start of a new conversation with a user."}
+            formatted_history.append(system_message)
+        else:
+            logging.debug(f"Continuing existing conversation for user {user_id} in channel {channel_id}")
 
         formatted_history.append({"role": "user", "content": personalized_message})
 
@@ -52,7 +60,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         should_mention_user = message.startswith('@bot') or (is_interaction(ctx) and ctx.command.name == 'ai')
 
         bot_response = await chat_with_ai(formatted_history, max_tokens)
-        logging.debug(f"Bot response: {bot_response}")
+        logging.debug(f"Bot response for user {user_id}: {bot_response}")
 
         # If the user used @bot or /ai, prepend the response with @personne
         mentioned_user_id = None
@@ -68,5 +76,6 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         update_cooldown(user_id)
 
     except Exception as e:
-        logging.error(f"Error in ai_command: {str(e)}", exc_info=True)
-        await send_message(ctx, f"Sorry, I encountered an error while processing your request.")
+        logging.error(f"Error in ai_command for user {user_id}: {str(e)}", exc_info=True)
+        error_message = f"Sorry, I encountered an error while processing your request. Error: {str(e)}"
+        await send_message(ctx, error_message)
