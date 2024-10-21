@@ -1,6 +1,6 @@
 from typing import List, Tuple, Optional, Any
 from .database_connection import execute_query
-from src.config import DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT
+from config import DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT
 import logging
 
 logging.basicConfig(level=logging.DEBUG)

@@ -3,7 +3,7 @@ import logging
 from typing import List
 from src.database.history_retrieval import get_history
 from src.utils.message_formatting import format_message
-from src.config import MAX_EMBED_LENGTH, MESSAGES_PER_PAGE
+from config import MAX_EMBED_LENGTH, MESSAGES_PER_PAGE
 
 async def get_channel_choices(interaction: discord.Interaction, current: str) -> List[discord.app_commands.Choice[str]]:
     choices = []

@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.config import MAX_MESSAGE_LENGTH
+from config import MAX_MESSAGE_LENGTH
 
 def format_message(message_user_id, content, model, message_type, timestamp, mentioned_user_id=None):
     formatted_time = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")

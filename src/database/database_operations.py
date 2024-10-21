@@ -2,7 +2,7 @@ from src.utils.logging_utils import get_logger
 from .message_operations import insert_message
 from .personalization_operations import get_personalization, set_personalization
 from .ai_preferences_operations import get_ai_preferences, set_ai_preferences
-from src.config import DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT
+from config import DEFAULT_CHAT_MODEL, DEFAULT_MAX_OUTPUT
 from .history_retrieval import get_history
 from .history_clearing import clear_user_history
 from .history_counting import count_user_history

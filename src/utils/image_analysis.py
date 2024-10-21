@@ -1,6 +1,6 @@
 import aiohttp
-from src.config import OPENROUTER_URL, IMAGE_ANALYSIS_MODEL
-from src.config import get_headers
+from config import OPENROUTER_URL, IMAGE_ANALYSIS_MODEL
+from config import get_headers
 
 async def analyze_image(image_url, chat_history=None):
     headers = get_headers()
