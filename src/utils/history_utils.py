@@ -19,13 +19,13 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
         logging.debug(f"Fetching history for channel {channel_id}, page {page}, filter_type {filter_type}, user {user}")
         
         user_id = user.id if user else interaction.user.id
-        total_messages = await get_history(user_id, count_only=True)
+        total_messages = await get_history(user_id, channel_id, count_only=True)
         
         # Calculate the correct offset for reversed order
         total_pages = (total_messages + MESSAGES_PER_PAGE - 1) // MESSAGES_PER_PAGE
         offset = max(0, total_messages - page * MESSAGES_PER_PAGE)
         
-        chat_history = await get_history(user_id, MESSAGES_PER_PAGE, offset)
+        chat_history = await get_history(user_id, channel_id, MESSAGES_PER_PAGE, offset)
         
         logging.debug(f"Retrieved {len(chat_history)} messages from database")
         
