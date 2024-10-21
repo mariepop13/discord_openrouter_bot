@@ -40,7 +40,7 @@ async def help_command(interaction: Interaction):
             ("/help", "Show this help message"),
             ("/ping", "Check if the bot is responsive"),
             ("/clear", "Clear all conversation history"),
-            ("/purge [amount]", "Delete a specified number of messages (or all if no amount is given)")
+            ("/purge [amount]", "Delete a specified number of messages (or all if no amount is given) - Admin only")
         ],
         "AI Commands": [
             ("/ai [message]", "Chat with the AI"),

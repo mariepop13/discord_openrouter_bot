@@ -17,7 +17,9 @@ def register_utility_commands(bot):
         await ping(interaction)
 
     @bot.tree.command(name="purge", description="Delete a specified number of messages (or all if no amount is given)")
-    @commands.has_permissions(manage_messages=True)
     async def purge_command(interaction: discord.Interaction, amount: int = None):
         logger.debug(f"Received /purge command with amount: {amount}")
-        await purge(interaction, amount)
+        if interaction.user.guild_permissions.administrator:
+            await purge(interaction, amount)
+        else:
+            await interaction.response.send_message("You don't have permission to use this command. Only administrators can use the purge command.", ephemeral=True)
