@@ -37,7 +37,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
     try:
         ai_prefs = await get_ai_preferences(user_id)
         model = model or ai_prefs[0]
-        max_tokens = max_tokens or ai_prefs[1]
+        max_tokens = int(max_tokens or ai_prefs[1] or 150)  # Default to 150 if both are None
         logging.debug(f"AI preferences for user {user_id}: model={model}, max_tokens={max_tokens}")
 
         personalization = await get_personalization(user_id)
@@ -59,7 +59,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         # Check if the message starts with @bot or if it's an /ai command
         should_mention_user = message.startswith('@bot') or (is_interaction(ctx) and ctx.command.name == 'ai')
 
-        bot_response = await chat_with_ai(formatted_history, max_tokens)
+        bot_response = await chat_with_ai(formatted_history, model=model, max_tokens=max_tokens)
         logging.debug(f"Bot response for user {user_id}: {bot_response}")
 
         # If the user used @bot or /ai, prepend the response with @personne

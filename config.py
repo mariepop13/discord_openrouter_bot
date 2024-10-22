@@ -37,12 +37,12 @@ LOG_FILES_TO_KEEP = load_env_value('LOG_FILES_TO_KEEP', 5)  # Default to keeping
 BOT_NAME = load_env_value('BOT_NAME', 'Discord OpenRouter Bot')
 HISTORY_LIMIT = load_env_value('HISTORY_LIMIT', 10)  # Default to 10 messages in history
 
-CHAT_MODEL = load_env_value('CHAT_MODEL', DEFAULT_CHAT_MODEL)
+CHAT_MODEL_ENV = load_env_value('CHAT_MODEL', DEFAULT_CHAT_MODEL)
 IMAGE_ANALYSIS_MODEL = load_env_value('IMAGE_ANALYSIS_MODEL', DEFAULT_IMAGE_ANALYSIS_MODEL)
 
 # Chat Data Configuration
-CHAT_DATA = {
-    "model": CHAT_MODEL,
+CHAT_MODEL = {
+    "model": CHAT_MODEL_ENV,
     "max_tokens": DEFAULT_MAX_OUTPUT
 }
 
