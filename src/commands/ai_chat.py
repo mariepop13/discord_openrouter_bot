@@ -1,7 +1,6 @@
 import discord
 from typing import Union, Optional
 import logging
-import os
 
 from src.utils.chat_utils import chat_with_ai
 from src.database.database_operations import get_personalization, get_ai_preferences
@@ -10,9 +9,7 @@ from src.database.channel_messages import get_messages_for_channel
 from src.commands.cooldown import is_on_cooldown, update_cooldown
 from src.utils.message_utils import get_personalized_message, format_chat_history
 from src.utils.discord_utils import send_message, get_user_id, get_channel_id, is_interaction
-
-CLIENT_ID = int(os.getenv('CLIENT_ID', '0'))
-HISTORY_LIMIT = int(os.getenv('HISTORY_LIMIT'))
+from config import CLIENT_ID, HISTORY_LIMIT, DEFAULT_MAX_OUTPUT
 
 async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: str, model: Optional[str] = None, max_tokens: Optional[int] = None):
     user_id = get_user_id(ctx)
@@ -37,7 +34,7 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
     try:
         ai_prefs = await get_ai_preferences(user_id)
         model = model or ai_prefs[0]
-        max_tokens = int(max_tokens or ai_prefs[1] or 150)  # Default to 150 if both are None
+        max_tokens = int(max_tokens or ai_prefs[1] or DEFAULT_MAX_OUTPUT)
         logging.debug(f"AI preferences for user {user_id}: model={model}, max_tokens={max_tokens}")
 
         personalization = await get_personalization(user_id)
