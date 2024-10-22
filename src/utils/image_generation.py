@@ -3,10 +3,11 @@ import uuid
 from pathlib import Path
 import logging
 import requests
+from config import DEFAULT_IMAGE_GENERATION_MODEL
 
 logger = logging.getLogger(__name__)
 
-async def generate_image(prompt, model="black-forest-labs/flux-dev", local_filename=None):
+async def generate_image(prompt, model=DEFAULT_IMAGE_GENERATION_MODEL, local_filename=None):
     logger.debug(f"Generating image with prompt: {prompt}, model: {model}")
     try:
         output = await replicate.async_run(

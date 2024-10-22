@@ -16,6 +16,11 @@ MESSAGES_PER_PAGE = 5
 DEFAULT_CHAT_MODEL = "google/gemini-flash-1.5"
 DEFAULT_IMAGE_ANALYSIS_MODEL = "openai/chatgpt-4o-latest"
 DEFAULT_MAX_OUTPUT = 150
+DEFAULT_IMAGE_GENERATION_MODEL = "black-forest-labs/flux-dev"
+
+# History and Cooldown Configuration
+HISTORY_LIMIT = 20
+COOLDOWN_TIME = 5
 
 def load_env_value(env_var, default):
     value = os.getenv(env_var)
@@ -35,7 +40,7 @@ OPENROUTER_API_KEY = load_env_value('OPENROUTER_API_KEY', None)
 REPLICATE_API_TOKEN = load_env_value('REPLICATE_API_TOKEN', None)
 LOG_FILES_TO_KEEP = load_env_value('LOG_FILES_TO_KEEP', 5)  # Default to keeping 5 log files
 BOT_NAME = load_env_value('BOT_NAME', 'Discord OpenRouter Bot')
-HISTORY_LIMIT = load_env_value('HISTORY_LIMIT', 10)  # Default to 10 messages in history
+HISTORY_LIMIT = load_env_value('HISTORY_LIMIT', HISTORY_LIMIT)  # Use the default from above if not set in .env
 
 CHAT_MODEL_ENV = load_env_value('CHAT_MODEL', DEFAULT_CHAT_MODEL)
 IMAGE_ANALYSIS_MODEL = load_env_value('IMAGE_ANALYSIS_MODEL', DEFAULT_IMAGE_ANALYSIS_MODEL)

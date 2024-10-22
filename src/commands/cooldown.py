@@ -1,8 +1,8 @@
 import time
 from collections import defaultdict
 import logging
+from config import COOLDOWN_TIME
 
-COOLDOWN_TIME = 5
 last_response_time = defaultdict(float)
 
 def is_on_cooldown(user_id: int) -> bool:

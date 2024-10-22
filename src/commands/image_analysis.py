@@ -2,14 +2,11 @@ import discord
 from src.utils.image_analysis import analyze_image
 from src.database.database_operations import get_history, insert_message
 import logging
-import os
+from config import CLIENT_ID, HISTORY_LIMIT
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-CLIENT_ID = int(os.getenv('CLIENT_ID', '0'))
-HISTORY_LIMIT = 20
 
 def format_chat_history(history):
     formatted_history = []
