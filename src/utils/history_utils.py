@@ -35,13 +35,17 @@ async def show_history_page(interaction: discord.Interaction, channel_id: int, p
             await send_no_history_message(interaction, page, user, ephemeral)
             return
         
-        # Reverse the order of messages
+        # Reverse the order of messages to display newest first
         chat_history.reverse()
         
         filtered_history = filter_history(chat_history, filter_type)
         
         bot_message_count = sum(1 for message in filtered_history if message[3] == 'bot')
         logging.info(f"Number of bot messages in filtered history: {bot_message_count}")
+        
+        # Log detailed information about each message
+        for idx, message in enumerate(filtered_history, 1):
+            logging.info(f"Message {idx}: Type: {message[3]}, Content: {message[1][:50]}...")
         
         formatted_history = format_history(filtered_history)
         chunks = create_chunks(formatted_history)
@@ -110,9 +114,9 @@ def create_history_embed(interaction: discord.Interaction, page, total_pages, ch
     # Update the footer to correctly reflect the message range being displayed
     start_message = max(1, total_messages - offset)
     end_message = min(total_messages, start_message + MESSAGES_PER_PAGE - 1)
-    embed.set_footer(text=f"Showing messages {start_message}-{end_message} out of {total_messages}")
+    embed.set_footer(text=f"Showing messages {end_message}-{start_message} out of {total_messages}")
     
-    logging.info(f"Created embed for page {page}/{total_pages}, showing messages {start_message}-{end_message} out of {total_messages}")
+    logging.info(f"Created embed for page {page}/{total_pages}, showing messages {end_message}-{start_message} out of {total_messages}")
     return embed
 
 async def handle_history_error(interaction: discord.Interaction, channel_id, error, ephemeral: bool = True):
