@@ -4,3 +4,4 @@ aiohttp
 replicate
 Pillow
 openai
+pytest

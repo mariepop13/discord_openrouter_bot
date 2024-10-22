@@ -16,7 +16,7 @@ async def test_ping():
     interaction.response.send_message.assert_called_once_with('Pong!', ephemeral=False)
 
 @pytest.mark.asyncio
-@patch('src.commands.general_commands.discord.Embed')
+@patch('src.commands.help_content.discord.Embed')
 async def test_help_command(mock_embed):
     interaction = AsyncMock()
     mock_embed_instance = mock_embed.return_value
@@ -28,18 +28,13 @@ async def test_help_command(mock_embed):
     interaction.response.send_message.assert_called_once()
 
 @pytest.mark.asyncio
-@patch('src.commands.general_commands.clear_user_history')
-async def test_clear(mock_clear_user_history):
+@patch('src.commands.general_commands.clear_command')
+async def test_clear(mock_clear_command):
     interaction = AsyncMock()
-    mock_clear_user_history.return_value = 5
-
+    
     await clear(interaction)
 
-    mock_clear_user_history.assert_called_once()
-    interaction.response.send_message.assert_called_once_with(
-        "All conversation history has been cleared. 5 entries have been deleted.",
-        ephemeral=True
-    )
+    mock_clear_command.assert_called_once_with(interaction)
 
 @pytest.mark.asyncio
 async def test_purge():

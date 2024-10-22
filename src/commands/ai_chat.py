@@ -37,7 +37,14 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         max_tokens = int(max_tokens or ai_prefs[1] or DEFAULT_MAX_OUTPUT)
         logging.debug(f"AI preferences for user {user_id}: model={model}, max_tokens={max_tokens}")
 
-        personalization = await get_personalization(user_id)
+        personalization_tuple = await get_personalization(user_id)
+        # Convert tuple to dictionary with proper keys
+        personalization = {
+            'personality': personalization_tuple[0] if personalization_tuple else None,
+            'tone': personalization_tuple[1] if personalization_tuple else None,
+            'language': personalization_tuple[2] if personalization_tuple else None
+        } if personalization_tuple else {}
+        
         personalized_message = get_personalized_message(personalization, message)
 
         chat_history = await get_messages_for_channel(channel_id, user_id, HISTORY_LIMIT)
