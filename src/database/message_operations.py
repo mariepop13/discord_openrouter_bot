@@ -1,6 +1,5 @@
 from .message_insertion import insert_message
-from .channel_messages import get_messages_for_channel
-from .user_messages import get_messages_for_user
+from .message_retrieval import get_messages_for_channel, get_messages_for_user
 from .last_message import get_last_message_for_channel
 
 # Re-export the functions

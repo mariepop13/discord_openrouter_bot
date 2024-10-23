@@ -1,107 +1,32 @@
 import os
-import discord
-from discord import Permissions
-from discord.ext import commands
-from dotenv import load_dotenv
-from src.commands.ai_chat import ai_command
 from src.utils.logging_utils import get_logger
 from src.utils.log_cleanup import cleanup_logs
-from src.database.database_schema import setup_database
-import asyncio
+from .bot_config import create_bot, generate_invite_link
+from .event_handlers import setup_event_handlers
+from .sync_commands import setup_sync_command
 
 logger = get_logger(__name__)
 
-def create_bot():
-    logger.debug("Creating bot with default intents...")
-    load_dotenv()
-    intents = discord.Intents.default()
-    intents.message_content = True
-    bot_name = os.getenv('BOT_NAME', 'Discord Image Analysis Bot')
-    bot = commands.Bot(command_prefix='!', intents=intents)
-    bot.bot_name = bot_name  # Store the bot name as an attribute
-    logger.debug(f"Bot '{bot_name}' created successfully.")
-    return bot
-
 def initialize_bot():
+    """Initialize the Discord bot with all necessary configurations and handlers."""
     logger.debug("Initializing bot...")
     
-    # Clean up log files before initializing the bot
+    # Clean up log files
     log_files_to_keep = int(os.getenv('LOG_FILES_TO_KEEP', 5))
     logger.info(f"Cleaning up log files, keeping the {log_files_to_keep} most recent files.")
-    cleanup_logs(keep_latest=log_files_to_keep)  # Pass the value to cleanup_logs
+    cleanup_logs(keep_latest=log_files_to_keep)
     logger.info("Log cleanup completed.")
     
+    # Create and configure the bot
     bot = create_bot()
-
-    # Generate and log the invite link
-    client_id = os.getenv('CLIENT_ID')
-    if client_id:
-        permissions = Permissions(
-            send_messages=True,
-            read_messages=True,
-            manage_messages=True,
-            view_channel=True,
-            read_message_history=True
-        )
-        invite_link = discord.utils.oauth_url(client_id, permissions=permissions, scopes=("bot", "applications.commands"))
-        logger.info(f"Bot invite link: {invite_link}")
-    else:
-        logger.warning("CLIENT_ID not found in .env file. Invite link couldn't be generated.")
-
-    @bot.event
-    async def on_ready():
-        logger.info(f"Bot '{bot.bot_name}' is ready.")
-        logger.info(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
-        
-        # Set up the database
-        logger.info("Setting up the database...")
-        await setup_database()
-        logger.info("Database setup completed.")
-        
-        # Set the bot's status to online with a custom activity
-        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Ready to chat!"))
-        logger.info("Bot status set to online with 'Ready to chat!' activity.")
-
-        await force_sync(bot)
-
-    @bot.event
-    async def on_message(message):
-        logger.debug(f"Received message: {message.content} from {message.author}")
-        if bot.user.mentioned_in(message) and not message.mention_everyone and not message.content.startswith('/'):
-            content = message.content.replace(f'<@{bot.user.id}>', '').strip()
-            logger.debug(f"Bot was mentioned. Processing message: {content}")
-            try:
-                await ai_command(message, content)
-                logger.debug("ai_command executed successfully.")
-            except Exception as e:
-                logger.error(f"Error in ai_command: {e}")
-                await message.channel.send(f"Sorry, I ({bot.bot_name}) encountered an error while processing your request.")
-        
-        await bot.process_commands(message)
-        logger.debug("Processed commands for the message.")
-
-    # Add the forcesync command to the bot
-    @commands.is_owner()
-    @commands.command(name='forcesync', hidden=True)
-    async def forcesync(ctx):
-        logger.info(f"Force sync requested by {ctx.author}")
-        synced = await force_sync(ctx.bot)
-        if synced:
-            await ctx.send(f'Synced {len(synced)} commands globally.')
-        else:
-            await ctx.send('Failed to sync commands. Check logs for details.')
-
-    bot.add_command(forcesync)
-    logger.info("Added forcesync command to the bot.")
-
+    
+    # Generate invite link
+    generate_invite_link(bot)
+    
+    # Set up event handlers
+    setup_event_handlers(bot)
+    
+    # Set up sync command
+    setup_sync_command(bot)
+    
     return bot
-
-async def force_sync(bot):
-    logger.info("Forcing a re-sync of all commands...")
-    try:
-        synced = await bot.tree.sync()
-        logger.info(f'Synced {len(synced)} commands globally.')
-        return synced
-    except Exception as e:
-        logger.error(f'Error syncing commands: {e}')
-        return None

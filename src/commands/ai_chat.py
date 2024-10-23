@@ -5,7 +5,7 @@ import logging
 from src.utils.chat_utils import chat_with_ai
 from src.database.database_operations import get_personalization, get_ai_preferences
 from src.database.message_insertion import insert_message
-from src.database.channel_messages import get_messages_for_channel
+from src.database.message_retrieval import get_messages_for_channel
 from src.commands.cooldown import is_on_cooldown, update_cooldown
 from src.utils.message_utils import get_personalized_message, format_chat_history
 from src.utils.discord_utils import send_message, get_user_id, get_channel_id, is_interaction
@@ -37,7 +37,14 @@ async def ai_command(ctx: Union[discord.Interaction, discord.Message], message: 
         max_tokens = int(max_tokens or ai_prefs[1] or DEFAULT_MAX_OUTPUT)
         logging.debug(f"AI preferences for user {user_id}: model={model}, max_tokens={max_tokens}")
 
-        personalization = await get_personalization(user_id)
+        personalization_tuple = await get_personalization(user_id)
+        # Convert tuple to dictionary with proper keys
+        personalization = {
+            'personality': personalization_tuple[0] if personalization_tuple else None,
+            'tone': personalization_tuple[1] if personalization_tuple else None,
+            'language': personalization_tuple[2] if personalization_tuple else None
+        } if personalization_tuple else {}
+        
         personalized_message = get_personalized_message(personalization, message)
 
         chat_history = await get_messages_for_channel(channel_id, user_id, HISTORY_LIMIT)
