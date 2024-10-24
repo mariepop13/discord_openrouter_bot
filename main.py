@@ -2,8 +2,8 @@ import os
 import sys
 from dotenv import load_dotenv
 from datetime import datetime
-from src.core.bot_setup import setup_bot
-from src.utils.logging_utils import setup_logging, get_logger
+from src.core.bot.bot_setup import setup_bot
+from src.utils.logging.logging_utils import setup_logging, get_logger
 
 def main():
     # Get the current timestamp

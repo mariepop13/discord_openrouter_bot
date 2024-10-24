@@ -1,5 +1,5 @@
 import logging
-from src.utils.message_formatting import format_message
+from src.utils.chat.message_formatting import format_message
 from config import MAX_EMBED_LENGTH
 
 def format_history(filtered_history):
